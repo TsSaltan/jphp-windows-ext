@@ -6,6 +6,15 @@
 
 ## Changelog
 ```
+--- 1.3 ---
+[Add] Windows::runAsAdmin()
+[Add] Windows::requireAdmin()
+[Add] Windows::setDate()
+[Add] Windows::setTime()
+[Add] Windows::getUsers()
+[Fix] Startup::getList() - Возвращает элементы автозагрузки для всех пользователей, а не только для текущего
+[Fix] Мелкие исправления
+
 --- 1.2 ---
 [Add] Class COM
 [Add] Windows::getTemperature()

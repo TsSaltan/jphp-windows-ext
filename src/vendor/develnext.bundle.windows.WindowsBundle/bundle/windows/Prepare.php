@@ -21,14 +21,46 @@ class Prepare
     private $source; 
     private $vars = []; // 'key' => 'value'
     private $safeQuery;
-            
+    
+    /**
+     * Обрамлять переменную кавычками
+     * @var boolean
+     */
     public $addStringQuotes = false;
+
+    /**
+     * Режим управления кавычками
+     * 0 - ничего не делаем
+     * 1 - кавычки экранируются \"
+     * 2 - кавычки экранируются ""
+     * @var int
+     */
+    public $quotesPolicy = 0;
+
+
+    /**
+     * Заменить отсутствующие переменные на NULL
+     * @var boolean
+     */
     public $replaceEmpty = false;
 
     public function __construct($query){
         $this->source = $query;
     }
     
+    /**
+     * @param array $bindParams [key => value] || [key => [value, type]]
+     */
+    public function bindAll($bindParams){
+        foreach($bindParams as $key => $value){
+            if(is_array($value)){
+                $this->bind($key, $value[0], $value[1]);
+            } else {
+                $this->bind($key, $value);
+            }
+        }
+    }
+
     public function bind($key, $value, $type = 'STRING'){
         $key = (str::sub($key, 0, 1) == ':') ? str::sub($key, 1) : $key;
         $key = str::lower($key);
@@ -38,11 +70,21 @@ class Prepare
                 $value = strval($value);                
                 $value = str::replace($value, "\\", "\\\\");
                 
-                if($this->addStringQuotes === true){
-                    $value = str::replace($value, "\"", "\\\"");
-                    $this->vars[$key] = '"' . $value . '"';
+                switch($this->quotesPolicy){
+                    case 1:
+                        $value = str::replace($value, "\"", "\\\"");
+                    break;
+
+                    case 2:
+                        $value = str::replace($value, '"', '""');
+                    break;
                 }
-                else $this->vars[$key] = $value;
+                
+                if($this->addStringQuotes){
+                    $value = '"' . $value . '"';
+                } 
+
+                $this->vars[$key] = $value;
             break;            
             
             case self::INTEGER:
@@ -60,9 +102,7 @@ class Prepare
     }
     
     public function getQuery($bindParams = []){
-        foreach($bindParams as $key => $value){
-            $this->bind($key, $value);
-        }
+        $this->bindAll($bindParams);
         
         $reg = Regex::of(':([\w\d_]+)', Regex::UNICODE_CASE | Regex::CASE_INSENSITIVE | Regex::MULTILINE)->with($this->source);
         return $reg->replaceWithCallback(function($reg){

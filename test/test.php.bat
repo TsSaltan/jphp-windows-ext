@@ -12,17 +12,11 @@ use bundle\windows\Registry;
 use bundle\windows\COM;
 use bundle\windows\WindowsException;
 
-//Windows::Speak('test 123');
-//return Windows::asAdmin('cmd.exe');
-//Windows::requireAdmin();
+
+Windows::requireAdmin();
 Windows::setTime([10, 1, 105]);
 Windows::setDate('16.08.1995');
-/**
-global $argv;
-var_dump(['argv' => $argv]);
-Windows::requireAdmin();
-var_dump(['isAdmin' => Windows::isAdmin()]);
-die;
+
 
 var_dump(Windows::getTotalRAM());
 var_dump(['is_admin' => Windows::isAdmin()]);	

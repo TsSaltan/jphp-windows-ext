@@ -15,7 +15,7 @@ use php\util\Regex;
  */
 class WindowsScriptHost
 {
-    protected static function Exec($cmd, $wait = false, $charset = 'cp1251'){
+    protected static function exec($cmd, $wait = false, $charset = 'cp1251'){
         $cmd = (!is_array($cmd)) ? [$cmd] : $cmd;
         
         $process = new Process($cmd);
@@ -95,6 +95,10 @@ class WindowsScriptHost
      */
     public static function vbScript($query, $params = []){
         $command = Prepare::Query($query, $params); 
-        return self::cmd('mshta vbscript:Execute(":query(window.close)")', ['query' => str::replace($command, '"', '""')]);
+
+        $cmd = new Prepare('mshta.exe vbscript:Execute(":query(window.close)")');
+        $cmd->addStringQuotes = false;
+        $cmd->quotesPolicy = 2;
+        return self::cmd($cmd->getQuery(['query' => $command]));
     }
 }

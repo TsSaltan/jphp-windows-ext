@@ -14,4 +14,4 @@ global $argv;
 var_dump(['argv' => $argv]);
 var_dump(['isAdmin' => Windows::isAdmin()]);
 
-var_dump(Windows::requireAdmin());
+Windows::requireAdmin();

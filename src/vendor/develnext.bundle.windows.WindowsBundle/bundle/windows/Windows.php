@@ -14,13 +14,8 @@ use php\time\Time;
 use php\time\TimeFormat;
 use php\util\Regex;
 
-
 class Windows
 {
-    /**
-     * Текущая версия пакета
-     */
-    const VERSION = '1.2.1.3-dev';
 
     /**
      * --RU--
@@ -92,6 +87,8 @@ class Windows
         global $argv;
         if(self::isAdmin()) return;
 
+        // Программа либо не собрана, либо библиотеки находятся отдельно от исполняемог файла,
+        // а значит узнать команду запуска и путь к исполняемому файлу невозможно
         if(str::endsWith($argv[0], '/lib/jphp-core.jar')) throw new WindowsException('Cannot restart this build with administrator privileges');
 
         if(str::startsWith($argv[0], '/') and str::contains($argv[0], ':')){
@@ -105,7 +102,7 @@ class Windows
             break;
 
             case 'jar':
-                $cmd = 'javaw.exe';
+                $cmd = 'javaw.exe'; // javaw запускает jar без консоли
                 $params = array_merge(['-jar'], $argv);
             break;
 
