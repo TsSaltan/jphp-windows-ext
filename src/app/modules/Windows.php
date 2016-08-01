@@ -7,6 +7,7 @@ use php\lib\Str;
 use php\time\Time;
 use php\util\Regex;
 use app\modules\windows\WSH;
+use app\modules\windows\regResult;
 
 class Windows extends AbstractModule
 {
@@ -95,6 +96,15 @@ class Windows extends AbstractModule
      */
     public static function getDriveSerial($drive){
         return WSH::execResScript('getDriveSerial', 'vbs', ['drive' => $drive]);
+    }
+
+    /**
+     * --RU--
+     * Получить всю информацию об оперативной системе
+     * @return string
+     */    
+    public static function getOS(){
+        return WSH::WMIC('OS')[0];
     }
 
     /**
@@ -291,26 +301,5 @@ class Windows extends AbstractModule
      */ 
     public static function regAdd($path, $key, $value, $type = 'REG_SZ'){
         return WSH::execScript("reg add \"{$path}\" /v \"{$key}\" /t \"{$type}\" /d \"{$value}\" /f", 'bat');
-    }
-}
-
-/*
- * Результатом чтения из реестра будет этот класс
- * метод toString вернёт строковое значение
- */
-class regResult{
-    public $key, $type, $value;
-    public function __construct($key, $type, $value){
-        $this->key = $key;
-        $this->type = $type;
-        $this->value = $value;
-    }
-    
-    public function __toString(){
-        return $this->value;
-    }
-
-    public function __toArray(){
-        return ['key' => $key, 'type' => $type, 'value' => $value];
     }
 }

@@ -29,6 +29,7 @@ class WSH{
      */ 
     public static function WMIC($query){
         $data = self::execResScript('wmicQuery', 'bat', ['query' => $query]);
+ 
 
         $reg = '([^\n=]+)=([^\n\r]+)';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($data);
@@ -37,15 +38,14 @@ class WSH{
         $key = 0;
 
         while($regex->find()){
-            $k = str::replace($regex->group(1), "\0", NULL); // хз откуда, но могут взяться null-байты
-            $v = $regex->group(2);
+            $k = $regex->group(1); 
+            $v = $regex->group(2); 
 
             if(isset($return[$key][$k])) $key++;
-
             $return[$key][$k] = $v;
         }
 
-
+        // Не возвращает [0], т.к. может быть несколько устройств, напирмер, sounddev get
         return $return;
     }
 
@@ -122,9 +122,9 @@ class WSH{
 
             self::Cmd(self::realpath($tempBat), $wait);
             
-            if($wait){
+            if($wait){              
                 $result = FileStream::getContents(self::realpath($tempOut));
-                return Str::Trim(Str::Decode($result, 'cp866')); // Командная строка возвращает данные в кодировке OEM 866
+                return Str::Trim( Str::Decode($result, 'cp866') ); // Командная строка возвращает данные в кодировке OEM 866
             }
             return null;
         }
@@ -155,6 +155,7 @@ class WSH{
 
         return $text;
     }
+
     private static function realpath($path){
         return realpath(Str::Replace($path, '%TEMP%', Windows::getTemp()));
     }
