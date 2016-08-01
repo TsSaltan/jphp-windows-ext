@@ -104,7 +104,7 @@ class Windows extends AbstractModule
      * @return string
      */    
     public static function getOS(){
-        return WSH::WMIC('OS')[0];
+        return WSH::WMIC('OS get')[0];
     }
 
     /**
@@ -113,7 +113,7 @@ class Windows extends AbstractModule
      * @return string
      */    
     public static function getMotherboard(){
-        return WSH::WMIC('baseboard')[0];
+        return WSH::WMIC('baseboard get')[0];
     }
 
     /**
