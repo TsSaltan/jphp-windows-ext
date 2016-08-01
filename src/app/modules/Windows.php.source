@@ -99,6 +99,15 @@ class Windows extends AbstractModule
 
     /**
      * --RU--
+     * Получить всю информацию о материнской плате
+     * @return string
+     */    
+    public static function getMotherboard(){
+        return WSH::WMIC('baseboard')[0];
+    }
+
+    /**
+     * --RU--
      * Получить сериальный номер материнской платы
      * @return string
      */    
@@ -171,6 +180,15 @@ class Windows extends AbstractModule
 
     /**
      * --RU--
+     * Получить информацию о процессоре
+     * @return string
+     */    
+    public static function getCPU(){
+        return WSH::WMIC('CPU get')[0];
+    }
+
+    /**
+     * --RU--
      * Получить модель видеокарты
      * @return string
      */    
@@ -203,6 +221,15 @@ class Windows extends AbstractModule
      */    
     public static function getVideoMode(){
         return WSH::WMIC('Path Win32_VideoController Get VideoModeDescription')[0]['VideoModeDescription'];
+    }
+
+    /**
+     * --RU--
+     * Получить всю информацию о видеокарте
+     * @return string
+     */    
+    public static function getVideo(){
+        return WSH::WMIC('Path Win32_VideoController Get');
     }
 
 
