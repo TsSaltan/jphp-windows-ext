@@ -1,7 +1,6 @@
 <?php
 namespace app\modules;
 
-//use php\gui\framework\AbstractModule;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\Str;
@@ -10,11 +9,9 @@ use php\util\Regex;
 use app\modules\windows\WSH;
 use app\modules\windows\regResult;
 
-class Windows //extends AbstractModule
+class Windows
 {
     public function __construct(){
-        //parent::__construct();
-
         if(!self::isWin()){
             throw new windowsException('This program should be run on OS Windows');
         }
@@ -200,7 +197,7 @@ class Windows //extends AbstractModule
 
     /**
      * --RU--
-     * Получить модель видеокарты
+     * Получить модель (первой) видеокарты
      * @return string
      */    
     public static function getVideoProduct(){
@@ -209,7 +206,7 @@ class Windows //extends AbstractModule
 
     /**
      * --RU--
-     * Получить производителя видеокарты
+     * Получить производителя (первой) видеокарты
      * @return string
      */    
     public static function getVideoManufacturer(){
@@ -218,7 +215,7 @@ class Windows //extends AbstractModule
 
     /**
      * --RU--
-     * Получить память видеокарты
+     * Получить память (первой) видеокарты
      * @return string
      */    
     public static function getVideoRAM(){
@@ -227,7 +224,7 @@ class Windows //extends AbstractModule
 
     /**
      * --RU--
-     * Получить режим (разрешение) видеокарты
+     * Получить разрешение (первой) видеокарты
      * @return string
      */    
     public static function getVideoMode(){
@@ -236,7 +233,7 @@ class Windows //extends AbstractModule
 
     /**
      * --RU--
-     * Получить всю информацию о видеокарте
+     * Получить всю информацию о видеокартах
      * @return string
      */    
     public static function getVideo(){
