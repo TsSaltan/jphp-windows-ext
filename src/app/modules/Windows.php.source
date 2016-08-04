@@ -1,19 +1,21 @@
 <?php
 namespace app\modules;
 
+use php\gui\framework\AbstractModule;
 use php\lang\System;
-use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Regex;
 use app\modules\windows\WSH;
 use app\modules\windows\regResult;
 
-class Windows
+class Windows extends AbstractModule
 {
     public function __construct(){
+        parent::__construct();
+
         if(!self::isWin()){
-            throw new windowsException('This program should be run on OS Windows');
+            alert('Внимание! Программа предназначена для работы на ОС Windows!');
         }
     }
 
@@ -197,7 +199,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить модель (первой) видеокарты
+     * Получить модель видеокарты
      * @return string
      */    
     public static function getVideoProduct(){
@@ -206,7 +208,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить производителя (первой) видеокарты
+     * Получить производителя видеокарты
      * @return string
      */    
     public static function getVideoManufacturer(){
@@ -215,7 +217,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить память (первой) видеокарты
+     * Получить память видеокарты
      * @return string
      */    
     public static function getVideoRAM(){
@@ -224,7 +226,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить разрешение (первой) видеокарты
+     * Получить режим (разрешение) видеокарты
      * @return string
      */    
     public static function getVideoMode(){
@@ -233,7 +235,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить всю информацию о видеокартах
+     * Получить всю информацию о видеокарте
      * @return string
      */    
     public static function getVideo(){
@@ -300,39 +302,4 @@ class Windows
     public static function regAdd($path, $key, $value, $type = 'REG_SZ'){
         return WSH::execScript("reg add \"{$path}\" /v \"{$key}\" /t \"{$type}\" /d \"{$value}\" /f", 'bat');
     }
-
-    /**
-     * --RU--
-     * Добавить программу в автозагрузку
-     * @param string $path - Путь к исполняющему файлу
-     */ 
-    public static function startupAdd($path){
-        if(!fs::isFile($path)) throw new windowsException('Invalid path "'.$path.'"');
-
-        $path = self::getStartupPaths($path);
-        return WSH::execResScript('startupAdd', 'js', $path);
-    }
-
-    /**
-     * --RU--
-     * Удалить программу из автозагрузки
-     * @param string $path - Путь к исполняющему файлу
-     */ 
-    public static function startupDelete($path){
-        if(!fs::isFile($path)) throw new windowsException('Invalid path "'.$path.'"');
-
-        $path = self::getStartupPaths($path);
-        return WSH::execResScript('startupDelete', 'js', $path);
-    }
-
-    private static function getStartupPaths($path){
-        $path = realpath($path);
-        return [
-            'basename' => str::replace(str::replace($path, '\\', '--'), ':', '--'),
-            'fullpath' => str::replace($path, '\\', '\\\\'),
-            'dir' => str::replace(dirname($path), '\\', '\\\\')
-        ];
-    }
 }
-
-class windowsException extends \Exception{}
