@@ -6,11 +6,17 @@ use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
 use php\util\Regex;
+use php\framework\Logger;
 use app\modules\windows\WSH;
 use app\modules\windows\regResult;
 
 class Windows
 {
+    const DEBUG = false;
+    public function log(){
+        if(self::DEBUG) Logger::Debug(var_export(func_get_args(), true));
+    }
+
     public function __construct(){
         if(!self::isWin()){
             throw new windowsException('This program should be run on OS Windows');
@@ -33,14 +39,6 @@ class Windows
      */
     public static function getTemp(){
         return System::getEnv()['TEMP'];
-    }
-
-    /**
-     * --RU--
-     * Очистить временную папку
-     */ 
-    public static function clearTemp(){
-        return WSH::execResScript('clearTemp', 'bat');
     }
 
     /**
@@ -240,6 +238,14 @@ class Windows
         return WSH::WMIC('Path Win32_VideoController Get');
     }
 
+    /**
+     * --RU--
+     * Получить всю информацию о звуковых устройствах
+     * @return string
+     */    
+    public static function getSound(){
+        return WSH::WMIC('Sounddev Get');
+    }
 
     /**
      * --RU--
@@ -248,6 +254,44 @@ class Windows
      */ 
     public static function getUUID(){
         return WSH::execResScript('getUUID', 'vbs');
+    }
+
+    /**
+     * --RU--
+     * Получить ключ активации системы
+     * @return string
+     */ 
+    public static function getProductKey(){
+        return WSH::execResScript('getProductKey', 'bat');
+    }
+
+    /**
+     * --RU--
+     * Получить MAC-адрес сетевой карты
+     * @return string
+     */ 
+    public static function getMAC(){
+        return trim(explode(' ', WSH::CMD('getmac /fo table /NH')[0]));
+    }
+
+    /**
+     * --RU--
+     * Получить список установленного ПО
+     * @return string
+     */ 
+    public static function getInstalledSoftware(){
+        $data = [];
+        $list = self::regSub('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall');
+        foreach ($list as $key => $value) {
+            $simple = self::regRead($value);
+            $app = [];
+            foreach($simple as $v){
+                $app[$v->key] = $v->value;
+            }
+            $data[] = $app;
+        }
+
+        return $data;
     }
 
     /**
@@ -277,6 +321,16 @@ class Windows
         }
 
         return $return;
+    }
+
+    /**
+     * --RU--
+     * Получить подразделы
+     * @param string $path - Путь раздела
+     */ 
+    public static function regSub($path){
+        $result = WSH::execScript("reg query \"{$path}\" > \$outPath", 'bat');
+        return explode("\r\n", $result);
     }
 
     /**
@@ -323,6 +377,15 @@ class Windows
 
         $path = self::getStartupPaths($path);
         return WSH::execResScript('startupDelete', 'js', $path);
+    }
+
+    /**
+     * --RU--
+     * Получить список программ, находящихся в автозагрузке
+     * @return array
+     */ 
+    public static function startupGet(){
+        return WSH::WMIC('Startup Get');
     }
 
     private static function getStartupPaths($path){

@@ -5,6 +5,7 @@ use php\io\ResourceStream;
 use php\io\FileStream;
 use php\io\File;
 use php\lib\Str;
+use php\lib\fs;
 use php\time\Time;
 use php\util\Regex;
 use app\modules\Windows;
@@ -57,6 +58,8 @@ class WSH{
      * @param bool $wait - По умолчанию true (выполнить синхронно и вернуть результат)
      */ 
     public static function cmd($cmd, $wait = true){
+        Windows::log('wsh::cmd', $cmd);
+
         if($wait) return Str::Trim(`{$cmd}`);
         execute($cmd, false);
     }
@@ -87,6 +90,8 @@ class WSH{
      * @param bool $wait - true(выполнить синхронно и вернуть результат) || false (выполнить асинхронно)
      */ 
     public static function execScript($code, $type = 'js', $wait = true){
+        Windows::log('wsh::execScript', $code, $type);
+
         try{   
             $tempBat = '%TEMP%\\dnBridge_' . self::getUnique() . '.bat';
             $tempOut = '%TEMP%\\dnResult_' . self::getUnique() . '.txt';
@@ -95,9 +100,9 @@ class WSH{
 
             if($type != 'bat'){         
                 $resPath = '.data/wsh/bridge.bat';
-                $tempScr = '%TEMP%\\dnScript_'. self::getUnique() . '.'.$type;
+                $tempScr = self::realpath('%TEMP%\\dnScript_'. self::getUnique() . '.'.$type);
 
-                $sys = new FileStream(self::realpath($tempScr), 'a');
+                $sys = new FileStream($tempScr, 'a');
                 $sys->write($code);
                 
                 $stream = ResourceStream::getResources($resPath)[0];
@@ -120,10 +125,18 @@ class WSH{
             $bat->write(Str::Encode($data, 'cp866'));
             $bat->close();
 
-            self::Cmd(self::realpath($tempBat), $wait);
-            
+            $tempBat = self::realpath($tempBat);
+            $tempOut = self::realpath($tempOut);
+
+            self::Cmd($tempBat, $wait);
+            if(!Windows::DEBUG){
+                fs::delete($tempBat);
+                if(isset($tempScr)) fs::delete($tempScr);
+            }
+
             if($wait){              
-                $result = FileStream::getContents(self::realpath($tempOut));
+                $result = FileStream::getContents($tempOut);
+                if(!Windows::DEBUG) fs::delete($tempOut);
                 return Str::Trim( Str::Decode($result, 'cp866') ); // Командная строка возвращает данные в кодировке OEM 866
             }
             return null;
@@ -139,6 +152,8 @@ class WSH{
      * Выполнить скрипт из ресурсов программы
      */ 
     public static function execResScript($file, $type, $replaceParams = [], $wait = true){
+        Windows::log('wsh::execResScript', $file, $type, $replaceParams);
+
         $code = ResourceStream::getResources('.data/wsh/'.$file.'.'.$type)[0]->readFully();
         $code = self::replaceData($code, $replaceParams);
         return self::execScript($code, $type, $wait);
