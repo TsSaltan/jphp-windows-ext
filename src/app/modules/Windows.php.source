@@ -12,7 +12,7 @@ use app\modules\windows\regResult;
 
 class Windows
 {
-    const DEBUG = false;
+    const DEBUG = true;
     public function log(){
         if(self::DEBUG) Logger::Debug(var_export(func_get_args(), true));
     }
@@ -286,6 +286,7 @@ class Windows
             $simple = self::regRead($value);
             $app = [];
             foreach($simple as $v){
+                if(!in_array($v->key, ['DisplayName', 'DisplayIcon', 'Publisher', 'DisplayVersion', 'UninstallString', 'InstallLocation'])) continue;
                 $app[$v->key] = $v->value;
             }
             $data[] = $app;
@@ -357,14 +358,14 @@ class Windows
 
     /**
      * --RU--
-     * Добавить программу в автозагрузку
+     * Добавить программу в автозагрузку (нужны права администратора!)
      * @param string $path - Путь к исполняющему файлу
      */ 
     public static function startupAdd($path){
         if(!fs::isFile($path)) throw new windowsException('Invalid path "'.$path.'"');
 
-        $path = self::getStartupPaths($path);
-        return WSH::execResScript('startupAdd', 'js', $path);
+        $path = realpath($path);
+        return self::regAdd('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', $path, $path);
     }
 
     /**
@@ -373,10 +374,21 @@ class Windows
      * @param string $path - Путь к исполняющему файлу
      */ 
     public static function startupDelete($path){
-        if(!fs::isFile($path)) throw new windowsException('Invalid path "'.$path.'"');
+        $path = realpath($path);
+        return self::regDelete('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', $path);
+    }
 
-        $path = self::getStartupPaths($path);
-        return WSH::execResScript('startupDelete', 'js', $path);
+    /**
+     * --RU--
+     * Проверить,  находится ли программа в автозагрузке
+     * @param string $path - Путь к исполняющему файлу
+     * @return bool
+     */ 
+    public static function startupCheck($path){
+        $path = realpath($path);
+        $check = self::regRead('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', $path);
+
+        return (string)$check == $path;
     }
 
     /**
