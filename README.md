@@ -1,48 +1,11 @@
 @@ -1,213 +0,0 @@
 ## DevelNext Windows Module
-Добавляет функционал для работы с системными функциями ОС Windows. Включает в себя: работу с реестром, получение характеристик железа, работу с автозапуском и т.д.
+Добавляет функционал для работы с системными функциями ОС Windows. Включает в себя: работу с реестром, автозапуском, получение характеристик железа, параметров ОС и т.д.
+Корректно работает с русскоязычными символами
 
-#### Функции
+### Функции
+#### Информация о железе
 ```php
-/**
- * --RU--
- * Проверить, относится ли текущая система к семейству OS Windows
- * @return bool
- */
-public static function isWin();
-
-/**
- * --RU--
- * Получить путь ко временной папке
- * @return string
- */
-public static function getTemp();
-
-/**
- * --RU--
- * Очистить временную папку
- */
-public static function clearTemp();
-
-/**
- * --RU--
- * Получить массив запущенных процессов
- * @return array( [process, id, session, sessionNumber, memory], ...)
- */
-public static function getTasklist();
-
-/**
- * --RU--
- * Завершить процесс по его имени
- */
-public static function taskKill($procName);
-
-/**
- * --RU--
- * Проверить, запущен ли процесс
- */
-public static function taskExists($procName);
-
 /**
  * --RU--
  * Получить сериальный номер носителя
@@ -53,10 +16,10 @@ public static function getDriveSerial($drive);
 
 /**
  * --RU--
- * Получить всю информацию об оперативной системе
+ * Получить MAC-адрес сетевой карты
  * @return string
  */
-public static function getOS();
+public static function getMAC();
 
 /**
  * --RU--
@@ -165,11 +128,128 @@ public static function getVideo();
 
 /**
  * --RU--
+ * Получить всю информацию о звуковых устройствах
+ * @return string
+ */
+public static function getSound();
+
+/**
+ * --RU--
  * Получить уникальный UUID системы
  * @return string
  */
 public static function getUUID();
 
+```
+
+#### Информация о системе
+```php
+/**
+ * --RU--
+ * Проверить, относится ли текущая система к семейству OS Windows
+ * @return bool
+ */
+public static function isWin();
+
+/**
+ * --RU--
+ * Получить путь ко временной папке
+ * @return string
+ */
+public static function getTemp();
+
+/**
+ * --RU--
+ * Получить всю информацию об оперативной системе
+ * @return string
+ */
+public static function getOS();
+
+/**
+ * --RU--
+ * Получить ключ активации системы
+ * @return string
+ */
+public static function getProductKey();
+
+/**
+ * --RU--
+ * Получить список установленного ПО
+ * @return string
+ */
+public static function getInstalledSoftware();
+
+/**
+ * --RU--
+ * Получить время (timestamp) запуска системы
+ * @return int
+ */
+public static function getBootUptime();
+
+/**
+ * --RU--
+ * Получить время (timestamp) работы системы
+ * @return int
+ */
+public static function getUptime();
+```
+
+#### Работа с процессами
+```php
+/**
+ * --RU--
+ * Получить массив запущенных процессов
+ * @return array( [process, id, session, sessionNumber, memory], ...)
+ */
+public static function getTasklist();
+
+/**
+ * --RU--
+ * Завершить процесс по его имени
+ */
+public static function taskKill($procName);
+
+/**
+ * --RU--
+ * Проверить, запущен ли процесс
+ */
+public static function taskExists($procName);
+```
+
+#### Работа с автозапуском
+```php
+/**
+ * --RU--
+ * Добавить программу в автозагрузку (нужны права администратора!)
+ * @param string $path - Путь к исполняющему файлу
+ */
+public static function startupAdd($path);
+
+/**
+ * --RU--
+ * Удалить программу из автозагрузки
+ * @param string $path - Путь к исполняющему файлу
+ */
+public static function startupDelete($path);
+
+/**
+ * --RU--
+ * Проверить, находится ли программа в автозагрузке
+ * @param string $path - Путь к исполняющему файлу
+ * @return bool
+ */
+public static function startupCheck($path);
+
+/**
+ * --RU--
+ * Получить список программ, находящихся в автозагрузке
+ * @return array
+ */
+public static function startupGet();
+```
+
+#### Работа с реестром
+```php
 /**
  * --RU--
  * Прочитать параметр из реестра
@@ -178,6 +258,13 @@ public static function getUUID();
  * @return mixed (string - если 1 параметр, array - если несколько параметров)
  */
 public static function regRead($path, $key);
+
+/**
+ * --RU--
+ * Получить подразделы
+ * @param string $path - Путь раздела
+ */
+public static function regSub($path);
 
 /**
  * --RU--
@@ -196,19 +283,4 @@ public static function regDelete($path, $key);
  * @param string $type - Тип пременной (REG_SZ|REG_DWORD|REG_BINARY)
  */
 public static function regAdd($path, $key, $value, $type);
-
-/**
- * --RU--
- * Добавить программу в автозагрузку
- * @param string $path - Путь к исполняющему файлу
- */
-public static function startupAdd($path);
-
-/**
- * --RU--
- * Удалить программу из автозагрузки
- * @param string $path - Путь к исполняющему файлу
- */
-public static function startupDelete($path);
-
 ```

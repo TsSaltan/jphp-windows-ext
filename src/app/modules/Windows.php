@@ -5,6 +5,7 @@ use php\lang\System;
 use php\lib\fs;
 use php\lib\Str;
 use php\time\Time;
+use php\time\TimeFormat;
 use php\util\Regex;
 use php\framework\Logger;
 use app\modules\windows\WSH;
@@ -12,7 +13,7 @@ use app\modules\windows\regResult;
 
 class Windows
 {
-    const DEBUG = true;
+    const DEBUG = false;
     public function log(){
         if(self::DEBUG) Logger::Debug(var_export(func_get_args(), true));
     }
@@ -293,6 +294,25 @@ class Windows
         }
 
         return $data;
+    }
+
+    /**
+     * --RU--
+     * Получить время (timestamp) запуска системы
+     * @return int
+     */ 
+    public static function getBootUptime(){
+        $data = explode('.', WSH::WMIC('Os Get LastBootUpTime')[0]['LastBootUpTime'])[0];
+        return (new TimeFormat('yyyyMMddHHmmss'))->parse($data)->getTime();
+    }
+
+    /**
+     * --RU--
+     * Получить время (timestamp) работы системы
+     * @return int
+     */ 
+    public static function getUptime(){
+        return Time::Now()->getTime() - self::getBootUptime();
     }
 
     /**
