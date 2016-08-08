@@ -1,6 +1,7 @@
 # DevelNext dirs
 .dn/
 .gradle/
+build/
 lib/
 src_generated/
 src/.data/img/

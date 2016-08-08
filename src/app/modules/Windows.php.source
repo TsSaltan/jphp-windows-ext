@@ -272,7 +272,7 @@ class Windows
      * @return string
      */ 
     public static function getMAC(){
-        return trim(explode(' ', WSH::CMD('getmac /fo table /NH')[0]));
+        return trim(explode(' ', WSH::CMD('getmac /fo table /NH'))[0]);
     }
 
     /**
