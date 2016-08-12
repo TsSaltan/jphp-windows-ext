@@ -10,6 +10,7 @@ use php\util\Regex;
 use php\framework\Logger;
 use app\modules\windows\WSH;
 use app\modules\windows\regResult;
+use php\gui\UXApplication;
 
 class Windows
 {
@@ -31,6 +32,15 @@ class Windows
      */
     public static function isWin(){
         return Str::posIgnoreCase(System::getProperty('os.name'), 'WIN') > -1;
+    }
+
+    /**
+     * --RU--
+     * Проверить, запущена ли программа от имени администратора
+     * @return bool
+     */
+    public static function isAdmin(){
+        return str::length(WSH::CMD('reg query HKU\S-1-5-19')) > 0;
     }
 
     /**
@@ -272,7 +282,8 @@ class Windows
      * @return string
      */ 
     public static function getMAC(){
-        return trim(explode(' ', WSH::CMD('getmac /fo table /NH'))[0]);
+        return UXApplication::getMacAddress();
+        //return trim(explode(' ', WSH::CMD('getmac /fo table /NH'))[0]);
     }
 
     /**
@@ -418,15 +429,6 @@ class Windows
      */ 
     public static function startupGet(){
         return WSH::WMIC('Startup Get');
-    }
-
-    private static function getStartupPaths($path){
-        $path = realpath($path);
-        return [
-            'basename' => str::replace(str::replace($path, '\\', '--'), ':', '--'),
-            'fullpath' => str::replace($path, '\\', '\\\\'),
-            'dir' => str::replace(dirname($path), '\\', '\\\\')
-        ];
     }
 }
 
