@@ -339,7 +339,7 @@ class Windows
         $path = Str::Replace($path, '\\', '\\\\');
         $key = Str::Replace($key, '\\', '\\\\');
 
-        $reg = '\n[\s]{4}([^\s]+)[\s]{4}([^\s]+)([^\n\r]*)';
+        $reg = '\n[ ]{4}([^\n]+)[ ]{4}([^\n]+)[ ]{4}([^\n\r]*)';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($result);
         
         $return = [];

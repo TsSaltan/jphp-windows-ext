@@ -3,9 +3,11 @@
 Корректно работает с русскоязычными символами
 
 ### Changelog
+--- 0.4.0.3 ---
+**[Fix]** Windows::regRead(); <br />
 --- 0.4.0.2 ---
-**[Add]** Windows::getAdmin();
-**[Fix]** Windows::getMAC();
+**[Add]** Windows::getAdmin(); <br />
+**[Fix]** Windows::getMAC(); <br />
 
 ### Функции
 #### Информация о железе
