@@ -1,0 +1,15 @@
+
+bundle/windows/Windows.php
+bundle/windows/WindowsException.php
+bundle/windows/WindowsScriptHost.php
+bundle/windows/reg/regResult.php
+
+
+.data/wsh/bridge.bat
+.data/wsh/getDriveSerial.vbs
+.data/wsh/getProductKey.bat
+.data/wsh/getTasklist.bat
+.data/wsh/getUUID.vbs
+.data/wsh/regRead.bat
+.data/wsh/taskExists.bat
+.data/wsh/wmicQuery.bat
