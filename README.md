@@ -1,6 +1,6 @@
 **[Описание пакета](https://github.com/TsSaltan/DevelNext-Windows/wiki)**
 
-**[Основные функцмм](https://github.com/TsSaltan/DevelNext-Windows/wiki/Functions)**
+**[Основные функции](https://github.com/TsSaltan/DevelNext-Windows/wiki/Functions)**
 
 **[Установка](https://github.com/TsSaltan/DevelNext-Windows/wiki/Setup)**
 
