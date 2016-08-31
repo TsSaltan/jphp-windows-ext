@@ -2,6 +2,7 @@
 namespace bundle\windows;
 
 use bundle\windows\reg\regResult;
+use bundle\windows\util\ExeUtil;
 use bundle\windows\WindowsScriptHost as WSH;
 use php\lang\System;
 use php\lib\fs;
@@ -33,6 +34,31 @@ class Windows
 
     /**
      * --RU--
+     * Раскрыть переменные среды Windows 
+     * (%appdata%, %temp%, etc...)
+     * @param string $string
+     * @return string
+     */
+    public static function expandEnv($string){
+        $reg = '%([^%]+)%';
+        $regex = Regex::of($reg, Regex::CASE_INSENSITIVE)->with($string);
+        $env = System::getEnv();
+
+        while ($regex->find()) {
+            $key = $regex->group(1);
+            foreach($env as $k=>$v){
+                if(str::lower($k) == str::lower($key)){
+                    $string = str::replace($string, $regex->group(0), $v);
+                    break;
+                }
+            }
+        }
+        
+        return $string;
+    }
+
+     /**
+     * --RU--
      * Проверить, относится ли текущая система к семейству OS Windows
      * @return bool
      */
@@ -49,6 +75,15 @@ class Windows
     public static function isAdmin()
     {
         return str::length(WSH::CMD('reg query HKU\S-1-5-19')) > 0;
+    }
+
+    /**
+     * Получить разрядность системы
+     * @return string (x64|x86)
+     */
+    public static function getArch()
+    {
+        return isset(System::getEnv()['ProgramFiles(x86)']) ? 'x64' : 'x86'; // В 64-битных системах будет прописан путь к Program Filex (x86)
     }
 
     /**
@@ -127,7 +162,7 @@ class Windows
      * Get full information of current OS.
      * --RU--
      * Получить всю информацию об оперативной системе
-     * @return string
+     * @return array
      */
     public static function getOS()
     {
@@ -353,7 +388,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить время (timestamp) запуска системы
+     * Получить метку времени (в миллисекундах) запуска системы
      * @return int
      */
     public static function getBootUptime()
@@ -364,12 +399,44 @@ class Windows
 
     /**
      * --RU--
-     * Получить время (timestamp) работы системы
+     * Получить метку времени (в миллисекундах) работы системы
      * @return int
      */
     public static function getUptime()
     {
         return Time::Now()->getTime() - self::getBootUptime();
+    }
+
+    /**
+     * --RU--
+     * Получить метку времени (в миллисекундах) установки системы
+     * @return int
+     */
+    public static function getInstallTime()
+    {
+        return WSH::execResScript('getInstallTimestamp', 'js') * 1000; // в DN timestamp в миллисекундах
+    }
+
+    /**
+     * --RU--
+     * Сканировать  подключённые к сети устройства 
+     * (как в проводнике раздел "Сеть")
+     * @return array(['ip' => 'host'])
+     */
+    public static function scanNetwork()
+    {
+        $return = [];
+        $scan = explode("\n", WSH::execResScript('netScan', 'bat'));
+
+        foreach($scan as $v){
+            $tmp = explode(' - ', $v);
+            $return[] = [
+                'ip' => str::trim($tmp[0]),
+                'host' => str::trim($tmp[1]),
+            ];
+        }
+
+        return $return;
     }
 
     /**
@@ -485,5 +552,46 @@ class Windows
     public static function startupGet()
     {
         return WSH::WMIC('Startup Get');
+    }
+
+    /**
+     * --RU--
+     * Установить уровень громкости
+     * @param double $volume - уровень громкости от 0 до 100
+     */
+    public static function setVolume($volume){
+        $volume = ($volume >= 0 and $volume <= 100) ? $volume : 50;
+        $volume = round(65535/100*$volume);
+        return ExeUtil::run('nircmd', 'setsysvolume', $volume);
+    }    
+
+    /**
+     * --RU--
+     * Установить уровень яркости
+     * (доступно на портативных устройствах: планшетах, ноутбуках)
+     * @param double $brightness - уровень яркости от 0 до 100
+     */
+    public static function setBrightness($brightness){
+        $brightness = ($brightness >= 0 and $brightness <= 100) ? $brightness : 50;
+        return ExeUtil::run('nircmd', 'setbrightness', $brightness);
+    }
+
+    /**
+     * --RU--
+     * Очистить корзину
+     */
+    public static function emptyBin(){
+        return ExeUtil::run('nircmd', 'emptybin');
+    }
+
+    /**
+     * --RU--
+     * Проговорить текст
+     * @param string $text - Текст
+     * @param int $rate - Скорость (-10..10, по умолчанию - 0)
+     * @param int $volume - Громкость (0..100, по умолчанию - 100)
+     */
+    public static function speak($text, $rate = 0, $volume = 100){
+        return ExeUtil::run('nircmd', 'speak text', '"'.$text.'"', $rate, $volume);
     }
 }

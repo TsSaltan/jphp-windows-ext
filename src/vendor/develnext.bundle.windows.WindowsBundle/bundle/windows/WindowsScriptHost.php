@@ -2,6 +2,7 @@
 namespace bundle\windows;
 
 use bundle\windows\Windows;
+use bundle\windows\WindowsException;
 use php\io\ResourceStream;
 use php\io\FileStream;
 use php\io\File;
@@ -91,50 +92,68 @@ class WindowsScriptHost
      * @param string $type - (bat|vbs|js)
      * @param bool $wait - true(выполнить синхронно и вернуть результат) || false (выполнить асинхронно)
      * @return bool|null|string
+     * @throws WindowsException
      */
-    public static function execScript($code, $type = 'js', $wait = true)
+    public static function execScript($code, $type, $replace = [], $wait = true)
     {
         Windows::log('wsh::execScript', $code, $type);
+
         try {
-            $tempBat = '%TEMP%\\dnBridge_' . self::getUnique() . '.bat';
-            $tempOut = '%TEMP%\\dnResult_' . self::getUnique() . '.txt';
-            $bat = new FileStream(self::realpath($tempBat), 'a');
-            if ($type != 'bat') {
-                $resPath = '.data/wsh/bridge.bat';
-                $tempScr = self::realpath('%TEMP%\\dnScript_' . self::getUnique() . '.' . $type);
-                $sys = new FileStream($tempScr, 'a');
-                $sys->write($code);
+            // Временные файлы: "мост", скрипт, ответ
+            $tempBat = Windows::expandEnv('%TEMP%\\dnBridge_' . self::getUnique() . '.bat');
+            $tempScr = Windows::expandEnv('%TEMP%\\dnScript_' . self::getUnique() . '.' . $type);
+            $tempOut = Windows::expandEnv('%TEMP%\\dnResult_' . self::getUnique() . '.txt');
+            
+            $paths = [
+                'outPath' => $tempOut,
+                'scrPath' => $tempScr
+            ];
+            $replace = array_merge($paths, $replace);
 
-                $stream = ResourceStream::getResources($resPath)[0];
-                $data = self::replaceData($stream->readFully(), [
-                    'scriptPath' => $tempScr,
-                    'outPath' => $tempOut
-                ]);
 
-                $stream->close();
-                $sys->close();
+            switch($type){
+                // Скрипты js, vbs выполняем через "мост", чтоб вернуть в программу ответ
+                case 'js':
+                case 'jse':
+                case 'vbs':
+                case 'vbe':
+                    $script = new FileStream($tempScr, 'a');
+                    $script->write($code);
+                    $script->close();
+                    $code = self::getResScript('bridge', 'bat', $replace);
 
-            } else {
-                $data = self::replaceData($code, [
-                    'outPath' => $tempOut
-                ]);
+                case 'cmd':
+                case 'bat':
+                    $code = (str::contains($code, '$outPath') || str::contains($code, "\n")) ? $code : $code . ' > "$outPath"';
+                    $code = self::replaceData($code, $replace);
+                    $code = Str::Encode($code, 'cp866');
+
+                    $bridge = new FileStream($tempBat, 'a');
+                    $bridge->write($code);
+                    $bridge->close();
+                    self::cmd($tempBat, $wait);
+                break;
+
+                default:
+                    throw new WindowsException('Invalid script type "'. $type .'"');
             }
 
-            $bat->write(Str::Encode($data, 'cp866'));
-            $bat->close();
-            $tempBat = self::realpath($tempBat);
-            $tempOut = self::realpath($tempOut);
-            self::Cmd($tempBat, $wait);
-            if (!Windows::DEBUG) {
-                fs::delete($tempBat);
-                if (isset($tempScr)) fs::delete($tempScr);
-            }
-            if ($wait) {
+            if($wait and fs::exists($tempOut)){
                 $result = FileStream::getContents($tempOut);
-                if (!Windows::DEBUG) fs::delete($tempOut);
-                return Str::Trim(Str::Decode($result, 'cp866')); // Командная строка возвращает данные в кодировке OEM 866
+                $result = Str::Decode($result, 'cp866'); // Командная строка возвращает данные в кодировке OEM 866
+                $result = Str::Trim($result); 
             }
-            return null;
+            else $result = NULL;
+            
+            if (!Windows::DEBUG) {
+                // Файлы оставим только для дебага
+                fs::delete($tempBat);
+                fs::delete($tempScr);
+                fs::delete($tempOut);
+            }
+
+            return $result;
+
         } catch (\php\io\IOException $e) {
             return false;
         }
@@ -143,13 +162,36 @@ class WindowsScriptHost
     /**
      * --RU--
      * Выполнить скрипт из ресурсов программы
+     * @throws WindowsException
      */
     public static function execResScript($file, $type, $replaceParams = [], $wait = true)
     {
-        Windows::log('wsh::execResScript', $file, $type, $replaceParams);
-        $code = ResourceStream::getResources('.data/wsh/' . $file . '.' . $type)[0]->readFully();
+        $code = self::getResScript($file, $type, $replaceParams);
+        return self::execScript($code, $type, [], $wait);
+    }
+
+    public static function getResContent($path){
+        $res = ResourceStream::getResources($path);
+
+        if(!isset($res[0]) || !is_object($res[0])){
+            throw new WindowsException('Invalid resource script path "'.$path.'"');
+        }
+
+        return $res[0]->readFully();
+    }
+
+    public static function resExists($path){
+        $res = ResourceStream::getResources($path);
+        return (isset($res[0]) and is_object($res[0]));
+    }
+
+    private static function getResScript($file, $type, $replaceParams)
+    {
+        $code = self::getResContent('.data/windows/scripts/' . $file . '.' . $type);
         $code = self::replaceData($code, $replaceParams);
-        return self::execScript($code, $type, $wait);
+        
+        Windows::log('wsh::getResScript', ['file' => $file, 'type' => $type, 'replaceParams' => $replaceParams, 'code' => $code]);
+        return $code;
     }
 
     private static function getUnique()
@@ -165,8 +207,24 @@ class WindowsScriptHost
         return $text;
     }
 
-    private static function realpath($path)
-    {
-        return realpath(Str::Replace($path, '%TEMP%', Windows::getTemp()));
-    }
+   /* // Utilits
+    public static function runUtility(){
+        $cName = func_get_arg(0);
+
+        // 1. Install
+        $filename = $cName . '-' . Windows::getArch() . '.exe';
+        $path = Windows::expandEnv('%TEMP%\\dnBins\\' . $filename);
+
+        Windows::log('WSH::runUtility', ['path' => $path, 'cmd' => func_get_args()]);
+
+        if(!fs::exists($path)){
+            $res = self::getResContent('.data/windows/bins/' . $filename);
+            File::of($path)->createNewFile(true);
+            FileStream::putContents($path, $res);
+        }
+
+        $cmd = func_get_args();
+        $cmd[0] = $path;
+        return self::execScript(implode(' ', $cmd), 'bat');
+    }*/
 }
