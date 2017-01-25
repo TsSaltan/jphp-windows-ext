@@ -1,7 +1,3 @@
 <?php
 namespace bundle\windows;
-
-
-class WindowsException extends \Exception
-{
-}
+class WindowsException extends \Exception{}

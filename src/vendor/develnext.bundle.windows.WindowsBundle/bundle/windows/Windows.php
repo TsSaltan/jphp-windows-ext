@@ -1,44 +1,18 @@
 <?php
 namespace bundle\windows;
 
-use bundle\windows\reg\regResult;
-use bundle\windows\util\ExeUtil;
 use bundle\windows\WindowsScriptHost as WSH;
-use php\lang\System;
-use php\lib\fs;
-use php\lib\Str;
 use php\time\Time;
 use php\time\TimeFormat;
-use php\util\Regex;
-use php\framework\Logger;
 use php\gui\UXApplication;
+use php\lib\str;
+use php\lang\System;
+use php\util\Regex;
+use Exception;
 
-/**
- * Class Windows
- */
+
 class Windows
 {
-    const DEBUG = false;
-
-    public static function log()
-    {
-        if (self::DEBUG) Logger::Debug('[Windows] ' .var_export(func_get_args(), true));
-    }
-
-    public function __construct()
-    {
-        if (!self::isWin()) {
-            throw new WindowsException('This program should be run on OS Windows');
-        }
-    }
-
-    /**
-     * --RU--
-     * Раскрыть переменные среды Windows 
-     * (%appdata%, %temp%, etc...)
-     * @param string $string
-     * @return string
-     */
     public static function expandEnv($string){
         $reg = '%([^%]+)%';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE)->with($string);
@@ -56,8 +30,8 @@ class Windows
         
         return $string;
     }
-
-     /**
+    
+    /**
      * --RU--
      * Проверить, относится ли текущая система к семейству OS Windows
      * @return bool
@@ -66,7 +40,7 @@ class Windows
     {
         return Str::posIgnoreCase(System::getProperty('os.name'), 'WIN') > -1;
     }
-
+    
     /**
      * --RU--
      * Проверить, запущена ли программа от имени администратора
@@ -74,9 +48,14 @@ class Windows
      */
     public static function isAdmin()
     {
-        return str::length(WSH::CMD('reg query HKU\S-1-5-19')) > 0;
+        try {
+            (new Registry('HKU\\S-1-5-19'))->readFully();
+            return true;
+        } catch (WindowsException $e){
+            return false;
+        }
     }
-
+    
     /**
      * Получить разрядность системы
      * @return string (x64|x86)
@@ -94,9 +73,10 @@ class Windows
      */
     public static function getTemp()
     {
-        return System::getEnv()['TEMP'];
+        return self::expandEnv('%TEMP%');
     }
-
+    
+    
     /**
      * Return list of running tasks.
      * --RU--
@@ -107,7 +87,7 @@ class Windows
     {
         $return = [];
 
-        $tasks = explode("\r\n", WSH::execResScript('getTasklist', 'bat'));
+        $tasks = explode("\r\n", WSH::cmd('tasklist /FO CSV /NH'));
         $reg = '"([^"]+)","([^"]+)","([^"]+)","([^"]+)","([^"]+)"';
 
         foreach ($tasks as $task) {
@@ -125,7 +105,8 @@ class Windows
 
         return $return;
     }
-
+    
+    
     /**
      * Kill a process by name.
      * --RU--
@@ -133,7 +114,7 @@ class Windows
      */
     public static function taskKill($procName)
     {
-        return WSH::cmd('taskkill /IM "' . $procName . '" /F');
+        return WSH::cmd('taskkill /IM ":proc" /F', ['proc' => $procName]);
     }
 
     /**
@@ -143,20 +124,43 @@ class Windows
      */
     public static function taskExists($procName)
     {
-        return WSH::execResScript('taskExists', 'bat', ['process' => $procName]) == '0';
+        return WSH::cmd('tasklist /fi "imagename eq ":proc"" | find /i ":proc" > nul && echo %errorlevel%', ['proc' => $procName]) == '0';
     }
-
+    
     /**
      * Return serial number of a drive.
      * --RU--
      * Получить сериальный номер носителя
-     * @param string $drive - Буква диска
+     * @param string $drive Буква диска
      * @return string
      */
     public static function getDriveSerial($drive)
     {
-        return WSH::execResScript('getDriveSerial', 'vbs', ['drive' => $drive]);
+        $drive = str::endsWith($drive, ':') ? $drive : $drive . ':';
+        $parts = WSH::WMIC('path Win32_LogicalDiskToPartition get', true);
+        $devices = WSH::WMIC('path Win32_PhysicalMedia get', true);
+
+        foreach($parts as $part){
+            if(str::contains($part['Dependent'], '"' . $drive . '"')){
+                $regex = Regex::of('DeviceID="Disk #(\d+),', Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($part['Antecedent']);
+                if ($regex->find()) {
+                    $nDrive = $regex->group(1);
+                    foreach($devices as $device){
+                        if(str::contains($device['Tag'], 'DRIVE' . $nDrive)){
+                            return str::trim($device['SerialNumber']);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return null;
     }
+
+    public static function getDrives(){
+        return WSH::WMIC('path win32_logicaldisk get');
+    }
+    
 
     /**
      * Get full information of current OS.
@@ -166,7 +170,7 @@ class Windows
      */
     public static function getOS()
     {
-        return WSH::WMIC('OS get')[0];
+        return WSH::WMIC('OS get', true)[0];
     }
 
     /**
@@ -175,9 +179,8 @@ class Windows
      * Получить всю информацию о материнской плате
      * @return string
      */
-    public static function getMotherboard()
-    {
-        return WSH::WMIC('baseboard get')[0];
+    public static function getMotherboard(){
+        return WSH::WMIC('baseboard get', true)[0];
     }
 
     /**
@@ -186,9 +189,8 @@ class Windows
      * Получить сериальный номер материнской платы
      * @return string
      */
-    public static function getMotherboardSerial()
-    {
-        return WSH::WMIC('baseboard get SerialNumber')[0]['SerialNumber'];
+    public static function getMotherboardSerial(){
+        return WSH::WMIC('baseboard get SerialNumber', true)[0]['SerialNumber'];
     }
 
     /**
@@ -196,9 +198,8 @@ class Windows
      * Получить производителя материнской платы
      * @return string
      */
-    public static function getMotherboardManufacturer()
-    {
-        return WSH::WMIC('baseboard get Manufacturer')[0]['Manufacturer'];
+    public static function getMotherboardManufacturer(){
+        return WSH::WMIC('baseboard get Manufacturer', true)[0]['Manufacturer'];
     }
 
     /**
@@ -206,9 +207,8 @@ class Windows
      * Получить модель материнской платы
      * @return string
      */
-    public static function getMotherboardProduct()
-    {
-        return WSH::WMIC('baseboard get Product')[0]['Product'];
+    public static function getMotherboardProduct(){
+        return WSH::WMIC('baseboard get Product', true)[0]['Product'];
     }
 
     /**
@@ -216,9 +216,8 @@ class Windows
      * Получить вольтаж процессора
      * @return string
      */
-    public static function getCpuVoltage()
-    {
-        return WSH::WMIC('CPU get CurrentVoltage')[0]['CurrentVoltage'];
+    public static function getCpuVoltage(){
+        return WSH::WMIC('CPU get CurrentVoltage', true)[0]['CurrentVoltage'];
     }
 
     /**
@@ -226,9 +225,8 @@ class Windows
      * Получить производителя процессора
      * @return string
      */
-    public static function getCpuManufacturer()
-    {
-        return WSH::WMIC('CPU get Manufacturer')[0]['Manufacturer'];
+    public static function getCpuManufacturer(){
+        return WSH::WMIC('CPU get Manufacturer', true)[0]['Manufacturer'];
     }
 
     /**
@@ -236,9 +234,8 @@ class Windows
      * Получить частоту процессора
      * @return string
      */
-    public static function getCpuFrequency()
-    {
-        return WSH::WMIC('CPU get MaxClockSpeed')[0]['MaxClockSpeed'];
+    public static function getCpuFrequency(){
+        return WSH::WMIC('CPU get MaxClockSpeed', true)[0]['MaxClockSpeed'];
     }
 
     /**
@@ -246,9 +243,8 @@ class Windows
      * Получить серийный номер процессора
      * @return string
      */
-    public static function getCpuSerial()
-    {
-        return WSH::WMIC('CPU get ProcessorId')[0]['ProcessorId'];
+    public static function getCpuSerial(){
+        return WSH::WMIC('CPU get ProcessorId', true)[0]['ProcessorId'];
     }
 
     /**
@@ -256,9 +252,8 @@ class Windows
      * Получить модель процессора
      * @return string
      */
-    public static function getCpuProduct()
-    {
-        return WSH::WMIC('CPU get Name')[0]['Name'];
+    public static function getCpuProduct(){
+        return WSH::WMIC('CPU get Name', true)[0]['Name'];
     }
 
     /**
@@ -266,9 +261,8 @@ class Windows
      * Получить информацию о процессоре
      * @return string
      */
-    public static function getCPU()
-    {
-        return WSH::WMIC('CPU get')[0];
+    public static function getCPU(){
+        return WSH::WMIC('CPU get', true)[0];
     }
 
     /**
@@ -276,9 +270,8 @@ class Windows
      * Получить модель (первой) видеокарты
      * @return string
      */
-    public static function getVideoProduct()
-    {
-        return WSH::WMIC('Path Win32_VideoController Get VideoProcessor')[0]['VideoProcessor'];
+    public static function getVideoProduct(){
+        return WSH::WMIC('Path Win32_VideoController Get VideoProcessor', true)[0]['VideoProcessor'];
     }
 
     /**
@@ -286,9 +279,8 @@ class Windows
      * Получить производителя (первой) видеокарты
      * @return string
      */
-    public static function getVideoManufacturer()
-    {
-        return WSH::WMIC('Path Win32_VideoController Get AdapterCompatibility')[0]['AdapterCompatibility'];
+    public static function getVideoManufacturer(){
+        return WSH::WMIC('Path Win32_VideoController Get AdapterCompatibility', true)[0]['AdapterCompatibility'];
     }
 
     /**
@@ -296,9 +288,8 @@ class Windows
      * Получить память (первой) видеокарты
      * @return string
      */
-    public static function getVideoRAM()
-    {
-        return WSH::WMIC('Path Win32_VideoController Get AdapterRAM')[0]['AdapterRAM'];
+    public static function getVideoRAM(){
+        return WSH::WMIC('Path Win32_VideoController Get AdapterRAM', true)[0]['AdapterRAM'];
     }
 
     /**
@@ -306,9 +297,8 @@ class Windows
      * Получить разрешение (первой) видеокарты
      * @return string
      */
-    public static function getVideoMode()
-    {
-        return WSH::WMIC('Path Win32_VideoController Get VideoModeDescription')[0]['VideoModeDescription'];
+    public static function getVideoMode(){
+        return WSH::WMIC('Path Win32_VideoController Get VideoModeDescription', true)[0]['VideoModeDescription'];
     }
 
     /**
@@ -316,9 +306,8 @@ class Windows
      * Получить всю информацию о видеокартах
      * @return string
      */
-    public static function getVideo()
-    {
-        return WSH::WMIC('Path Win32_VideoController Get');
+    public static function getVideo(){
+        return WSH::WMIC('Path Win32_VideoController Get', true);
     }
 
     /**
@@ -326,9 +315,8 @@ class Windows
      * Получить всю информацию о звуковых устройствах
      * @return string
      */
-    public static function getSound()
-    {
-        return WSH::WMIC('Sounddev Get');
+    public static function getSound(){
+        return WSH::WMIC('Sounddev Get', true);
     }
 
     /**
@@ -336,20 +324,18 @@ class Windows
      * Получить уникальный UUID системы
      * @return string
      */
-    public static function getUUID()
-    {
-        return WSH::execResScript('getUUID', 'vbs');
+    public static function getUUID(){
+        return WSH::WMIC('path win32_computersystemproduct get', true)[0]['UUID'];
+        //return WSH::PowerShell('get-wmiobject Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID');
     }
 
     /**
-     * Returns the activation key of current system.
      * --RU--
-     * Получить ключ активации системы
+     * Получить ProductName системы
      * @return string
      */
-    public static function getProductKey()
-    {
-        return WSH::execResScript('getProductKey', 'bat');
+    public static function getProductName(){
+        return Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('ProductName')->value();
     }
 
     /**
@@ -358,42 +344,17 @@ class Windows
      * Получить MAC-адрес сетевой карты
      * @return string
      */
-    public static function getMAC()
-    {
+    public static function getMAC(){
         return UXApplication::getMacAddress();
-        //return trim(explode(' ', WSH::CMD('getmac /fo table /NH'))[0]);
     }
-
-    /**
-     * --RU--
-     * Получить список установленного ПО
-     * @return array
-     */
-    public static function getInstalledSoftware()
-    {
-        $data = [];
-        $list = self::regSub('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall');
-        foreach ($list as $key => $value) {
-            $simple = self::regRead($value);
-            $app = [];
-            foreach ($simple as $v) {
-                if (!in_array($v->key, ['DisplayName', 'DisplayIcon', 'Publisher', 'DisplayVersion', 'UninstallString', 'InstallLocation'])) continue;
-                $app[$v->key] = $v->value;
-            }
-            $data[] = $app;
-        }
-
-        return $data;
-    }
-
+    
     /**
      * --RU--
      * Получить метку времени (в миллисекундах) запуска системы
      * @return int
      */
-    public static function getBootUptime()
-    {
-        $data = explode('.', WSH::WMIC('Os Get LastBootUpTime')[0]['LastBootUpTime'])[0];
+    public static function getBootUptime(){
+        $data = explode('.', WSH::WMIC('Os Get LastBootUpTime', true)[0]['LastBootUpTime'])[0];
         return (new TimeFormat('yyyyMMddHHmmss'))->parse($data)->getTime();
     }
 
@@ -402,196 +363,53 @@ class Windows
      * Получить метку времени (в миллисекундах) работы системы
      * @return int
      */
-    public static function getUptime()
-    {
+    public static function getUptime(){
         return Time::Now()->getTime() - self::getBootUptime();
     }
 
     /**
      * --RU--
-     * Получить метку времени (в миллисекундах) установки системы
-     * @return int
-     */
-    public static function getInstallTime()
-    {
-        return WSH::execResScript('getInstallTimestamp', 'js') * 1000; // в DN timestamp в миллисекундах
-    }
-
-    /**
-     * --RU--
-     * Сканировать  подключённые к сети устройства 
-     * (как в проводнике раздел "Сеть")
-     * @return array(['ip' => 'host'])
-     */
-    public static function scanNetwork()
-    {
-        $return = [];
-        $scan = explode("\n", WSH::execResScript('netScan', 'bat'));
-
-        foreach($scan as $v){
-            $tmp = explode(' - ', $v);
-            $return[] = [
-                'ip' => str::trim($tmp[0]),
-                'host' => str::trim($tmp[1]),
-            ];
-        }
-
-        return $return;
-    }
-
-    /**
-     * --RU--
-     * Прочитать параметр из реестра
-     * @param string $path - Путь раздела
-     * @param string $key - Имя параметра, по умолчанию "*" - все параметры
-     * @return mixed (string - если 1 параметр, array - если несколько параметров)
-     */
-    public static function regRead($path, $key = '*')
-    {
-        $result = WSH::execResScript("regRead", 'bat', ['path' => $path, 'key' => $key]);
-
-        $reg = '\n[ ]{4}([^\n]+)[ ]{4}([^\n]+)[ ]{4}([^\n\r]*)';
-        $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($result);
-
-        $return = [];
-
-        while ($regex->find()) {
-            $result = new RegResult($regex->group(1), $regex->group(2), Str::Trim($regex->group(3)));
-            if ($key == '*') {
-                $return[] = $result;
-            } else return $result;
-        }
-
-        return $return;
-    }
-
-    /**
-     * --RU--
-     * Получить подразделы
-     * @param string $path - Путь раздела
-     * @return array
-     */
-    public static function regSub($path)
-    {
-        $result = WSH::execScript("reg query \"{$path}\" > \$outPath", 'bat');
-        return explode("\r\n", $result);
-    }
-
-    /**
-     * --RU--
-     * Удалить параметр из реестра
-     * @param string $path - Путь раздела
-     * @param string $key - Имя параметра
-     * @return bool|null|string
-     */
-    public static function regDelete($path, $key)
-    {
-        return WSH::execScript("reg delete \"{$path}\" /v \"{$key}\" /f", 'bat');
-    }
-
-    /**
-     * --RU--
-     * Добавить новый параметр в реестр
-     * @param string $path - Путь раздела
-     * @param string $key - Имя параметра
-     * @param string $value - Значение
-     * @param string $type - Тип пременной (REG_SZ|REG_DWORD|REG_BINARY)
-     * @return bool|null|string
-     */
-    public static function regAdd($path, $key, $value, $type = 'REG_SZ')
-    {
-        return WSH::execScript("reg add \"{$path}\" /v \"{$key}\" /t \"{$type}\" /d \"{$value}\" /f", 'bat');
-    }
-
-    /**
-     * --RU--
-     * Добавить программу в автозагрузку (нужны права администратора!)
-     * @param string $path - Путь к исполняющему файлу
-     * @return bool|null|string
+     * Получить данные о встроенной батарее
      * @throws WindowsException
-     */
-    public static function startupAdd($path)
-    {
-        if (!fs::isFile($path)) throw new WindowsException('Invalid path "' . $path . '"');
-
-        $path = fs::abs($path);
-        return self::regAdd('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', $path, $path);
-    }
-
-    /**
-     * --RU--
-     * Удалить программу из автозагрузки
-     * @param string $path - Путь к исполняющему файлу
-     * @return bool|null|string
-     */
-    public static function startupDelete($path)
-    {
-        $path = fs::abs($path);
-        return self::regDelete('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', $path);
-    }
-
-    /**
-     * --RU--
-     * Проверить,  находится ли программа в автозагрузке
-     * @param string $path - Путь к исполняющему файлу
-     * @return bool
-     */
-    public static function startupCheck($path)
-    {
-        $path = fs::abs($path);
-        $check = self::regRead('HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run', $path);
-
-        return $check->value == $path;
-    }
-
-    /**
-     * --RU--
-     * Получить список программ, находящихся в автозагрузке
      * @return array
      */
-    public static function startupGet()
-    {
-        return WSH::WMIC('Startup Get');
+    public static function getBatteryInfo(){
+        return WSH::WMIC('Path Win32_Battery Get')[0];
     }
 
     /**
      * --RU--
-     * Установить уровень громкости
-     * @param double $volume - уровень громкости от 0 до 100
+     * Создание lnk-ярлыка (ссылки на файл)
+     * @var string $shortcut Расположение ярлыка
+     * @var string $target Ссылка на файл
+     * @var string $description=null Описание
+     * @return null
      */
-    public static function setVolume($volume){
-        $volume = ($volume >= 0 and $volume <= 100) ? $volume : 50;
-        $volume = round(65535/100*$volume);
-        return ExeUtil::run('nircmd', 'setsysvolume', $volume);
-    }    
-
-    /**
-     * --RU--
-     * Установить уровень яркости
-     * (доступно на портативных устройствах: планшетах, ноутбуках)
-     * @param double $brightness - уровень яркости от 0 до 100
-     */
-    public static function setBrightness($brightness){
-        $brightness = ($brightness >= 0 and $brightness <= 100) ? $brightness : 50;
-        return ExeUtil::run('nircmd', 'setbrightness', $brightness);
+    public static function createShortcut($shortcut, $target, $description = null){
+        return WSH::PowerShell('$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut(\':shortcut\'); $S.TargetPath = \':target\'; $S.Description = \':description\'; $S.Save()', [
+            'shortcut' => $shortcut,
+            'target' => $target,
+            'description' => $description
+        ]);
     }
 
     /**
      * --RU--
-     * Очистить корзину
+     * Возвращает ссылку на файл lnk-ярлыка
+     * @var string $shortcut Расположение ярлыка
+     * @return string
      */
-    public static function emptyBin(){
-        return ExeUtil::run('nircmd', 'emptybin');
+    public static function getShortcutTarget($shortcut){
+        return WSH::cmd('type ":lnk"|find "\\"|findstr/b "[a-z]:[\\\\]"', ['lnk' => $shortcut]);
     }
 
     /**
      * --RU--
      * Проговорить текст
-     * @param string $text - Текст
-     * @param int $rate - Скорость (-10..10, по умолчанию - 0)
-     * @param int $volume - Громкость (0..100, по умолчанию - 100)
+     * @param string $text Текст
      */
-    public static function speak($text, $rate = 0, $volume = 100){
-        return ExeUtil::run('nircmd', 'speak text', '"'.$text.'"', $rate, $volume);
+    public static function speak($text){
+        return WSH::vbScript('CreateObject("SAPI.SpVoice").Speak("'.$text.'")(window.close)');
     }
+
 }
