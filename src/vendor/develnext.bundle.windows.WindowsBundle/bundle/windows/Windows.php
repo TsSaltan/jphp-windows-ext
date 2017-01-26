@@ -15,6 +15,8 @@ use Exception;
 
 class Windows
 {
+    const VERSION = '1.0.0.0';
+
     public static function expandEnv($string){
         $reg = '%([^%]+)%';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE)->with($string);

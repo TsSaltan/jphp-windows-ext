@@ -1,15 +1,38 @@
-**[Описание пакета](https://github.com/TsSaltan/DevelNext-Windows/wiki)**
-
-**[Основные функции](https://github.com/TsSaltan/DevelNext-Windows/wiki/Functions)**
-
-**[Установка](https://github.com/TsSaltan/DevelNext-Windows/wiki/Setup)**
-
-**[Демо-проекты](https://github.com/TsSaltan/DevelNext-Windows/wiki/Demo)**
-
+**[Wiki](https://tssaltan.ru/1156.develnext-windows/?)**
 **[Тема на форуме](http://community.develstudio.org/showthread.php/13689-Модуль-для-работы-с-ОС-Windows)**
 
----
+## Changelog
+```
+--- 1.0 ---
+... in progress
 
-**[Сборка пакета](https://github.com/jphp-compiler/develnext/blob/master/develnext-sdk/bundle/README.md)**
+--- 0.5 ---
+[Change] Модуль переделан в пакет расширений
+[Add] Встроена утилита nircmd, что позволило расширить функционал
+[Add] Windows::getArch()
+[Add] Windows::scanNetwork()
+[Add] Windows::expandEnv()
+[Add] Windows::setVolume()
+[Add] Windows::setBrightness()
+[Add] Windows::emptyBin()
+[Add] Windows::speak()
 
-**[Скачать собранный пакет](https://github.com/TsSaltan/DevelNext-Windows/raw/bundle/build/dn-windows-bundle.dnbundle)**
+--- 0.4.0.3 ---
+[Fix] Windows::regRead();
+
+--- 0.4.0.2 ---
+[Add] Windows::getAdmin();
+[Fix] Windows::getMAC();
+```
+
+
+## Build
+Windows
+```
+gradlew.bat bundle
+```
+
+Linux
+```
+gradlew bundle
+```
