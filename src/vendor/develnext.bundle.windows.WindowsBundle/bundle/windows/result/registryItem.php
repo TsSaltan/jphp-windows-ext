@@ -6,6 +6,23 @@ use bundle\windows\result\abstractItem;
 class registryItem extends abstractItem
 {
     /**
+     * --RU--
+     * Ключ
+     * @readonly
+     * @var mixed
+     */
+    public $key;
+
+    /**
+     * --RU--
+     * Значение
+     * @readonly
+     * @var mixed
+     */
+    public $value;
+
+    /**
+     * --RU--
      * Тип значения
      * @var string
      * @readonly
@@ -13,8 +30,9 @@ class registryItem extends abstractItem
     public $type;
 
     public function __construct($key, $type, $value){
-        $this->type = $type;
-        parent::__construct($key, $value);
+        $this->key = $key;
+        $this->value = $value;
+        $this->type = $type;        
     }
 
      /**
@@ -28,10 +46,27 @@ class registryItem extends abstractItem
     }
 
     /**
-     * [key, type, value].
-     * @return array
+     * Key name.
+     * --RU--
+     * Название ключа.
+     * @return string
      */
-    public function toArray(){
-        return ['key' => $this->key, 'type' => $this->type, 'value' => $this->value];
+    public function getKey(){
+        return $this->key;
     }
+
+    /**
+     * Value.
+     * --RU--
+     * Значение.
+     * @return string
+     */
+    public function getValue(){
+        return $this->value;
+    }
+
+    public function __toString(){
+        return (string) $this->value;
+    }
+
 }

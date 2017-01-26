@@ -11,10 +11,19 @@ abstract class abstractResult implements Iterator{
         $this->data[$key] = $value;
     }
 
+    public function first(){
+        return array_values($this->data)[0];
+    }
+
     public function rewind(){
         reset($this->data);
+        $this->next();
     }
   
+    public function length(){
+        return sizeof($this->data);
+    }
+
     public function current(){
         return current($this->data);
     }

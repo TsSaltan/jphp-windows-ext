@@ -8,9 +8,8 @@ use Iterator;
 
 class registryResult extends abstractResult{
     /**
-     * Путь реестра
-     * @var string
      * @readonly
+     * @var string
      */
     public $path;
 

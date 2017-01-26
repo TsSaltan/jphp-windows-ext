@@ -2,6 +2,8 @@
 namespace bundle\windows;
 
 use bundle\windows\WindowsScriptHost as WSH;
+use bundle\windows\Registry;
+use bundle\windows\Task;
 use php\time\Time;
 use php\time\TimeFormat;
 use php\gui\UXApplication;
@@ -75,57 +77,7 @@ class Windows
     {
         return self::expandEnv('%TEMP%');
     }
-    
-    
-    /**
-     * Return list of running tasks.
-     * --RU--
-     * Получить массив запущенных процессов
-     * @return array( [process, id, session, sessionNumber, memory], ...)
-     */
-    public static function getTaskList()
-    {
-        $return = [];
-
-        $tasks = explode("\r\n", WSH::cmd('tasklist /FO CSV /NH'));
-        $reg = '"([^"]+)","([^"]+)","([^"]+)","([^"]+)","([^"]+)"';
-
-        foreach ($tasks as $task) {
-            $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($task);
-            if ($regex->find()) {
-                $return[] = [
-                    'process' => $regex->group(1),
-                    'id' => $regex->group(2),
-                    'session' => $regex->group(3),
-                    'sessionNumber' => $regex->group(4),
-                    'memory' => $regex->group(5),
-                ];
-            }
-        }
-
-        return $return;
-    }
-    
-    
-    /**
-     * Kill a process by name.
-     * --RU--
-     * Завершить процесс по его имени
-     */
-    public static function taskKill($procName)
-    {
-        return WSH::cmd('taskkill /IM ":proc" /F', ['proc' => $procName]);
-    }
-
-    /**
-     * Check that process is running.
-     * --RU--
-     * Проверить, запущен ли процесс
-     */
-    public static function taskExists($procName)
-    {
-        return WSH::cmd('tasklist /fi "imagename eq ":proc"" | find /i ":proc" > nul && echo %errorlevel%', ['proc' => $procName]) == '0';
-    }
+      
     
     /**
      * Return serial number of a drive.
@@ -134,8 +86,7 @@ class Windows
      * @param string $drive Буква диска
      * @return string
      */
-    public static function getDriveSerial($drive)
-    {
+    public static function getDriveSerial($drive){
         $drive = str::endsWith($drive, ':') ? $drive : $drive . ':';
         $parts = WSH::WMIC('path Win32_LogicalDiskToPartition get', true);
         $devices = WSH::WMIC('path Win32_PhysicalMedia get', true);
@@ -153,7 +104,7 @@ class Windows
                 }
             }
         }
-        
+    
         return null;
     }
 
@@ -168,8 +119,7 @@ class Windows
      * Получить всю информацию об оперативной системе
      * @return array
      */
-    public static function getOS()
-    {
+    public static function getOS(){
         return WSH::WMIC('OS get', true)[0];
     }
 
@@ -335,7 +285,7 @@ class Windows
      * @return string
      */
     public static function getProductName(){
-        return Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('ProductName')->value();
+        return Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('ProductName')->value;
     }
 
     /**

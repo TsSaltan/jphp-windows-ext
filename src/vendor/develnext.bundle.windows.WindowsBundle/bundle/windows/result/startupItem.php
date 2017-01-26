@@ -1,6 +1,7 @@
 <?php
 namespace bundle\windows\result;
 
+use bundle\windows\result\abstractItem;
 use bundle\windows\Startup;
 use bundle\windows\Windows;
 use bundle\windows\WindowsException;
@@ -8,9 +9,47 @@ use bundle\windows\Registry;
 use php\lib\str;
 use php\lib\fs;
 
-class startupItem
+class startupItem extends abstractItem
 {
-    private $title, $command, $file, $shortcut, $location;
+    /**
+     * --RU--
+     * Заголовок 
+     * @readonly
+     * @var string
+     */
+    public $title;
+
+    /**
+     * --RU--
+     * Команда для запуска 
+     * @readonly
+     * @var string
+     */
+    public $command;
+
+    /**
+     * --RU--
+     * Путь к файлу
+     * @readonly
+     * @var string
+     */
+    public $file;
+
+    /**
+     * --RU--
+     * Путь к ярлыку
+     * @readonly
+     * @var string
+     */
+    public $shortcut;
+
+    /**
+     * --RU--
+     * Расположение записи (Реестр, папка startup и т.д.)
+     * @readonly
+     * @var string
+     */
+    public $location;
 
     public function __construct($title, $command, $location){
         $this->title = $title;
@@ -52,7 +91,7 @@ class startupItem
      * Заголовок
      * @return string
      */
-    public function title(){
+    public function getTitle(){
         return $this->title;
     }
 
@@ -61,7 +100,7 @@ class startupItem
      * Команда для запуска
      * @return string
      */
-    public function command(){
+    public function getCommand(){
         return $this->command;
     }
 
@@ -70,7 +109,7 @@ class startupItem
      * Путь к исполняемому файлу
      * @return string
      */
-    public function file(){
+    public function getFile(){
         return $this->file;
     }
     
@@ -79,7 +118,7 @@ class startupItem
      * Расположение ярлыка для запуска
      * @return string
      */
-    public function shortcut(){
+    public function getShortcut(){
         return $this->shortcut;
     }
 
@@ -88,15 +127,7 @@ class startupItem
      * Расположение записи для запуска
      * @return string
      */
-    public function location(){
+    public function getLocation(){
         return $this->location;
-    }
-
-    /**
-     * [title, command, file, shortcut, location].
-     * @return array
-     */
-    public function toArray(){
-        return ['title' => $this->title, 'command' => $this->command, 'file' => $this->file, 'shortcut' => $this->shortcut, 'location' => $this->location];
     }
 }

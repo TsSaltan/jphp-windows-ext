@@ -7,6 +7,7 @@ include DIR . "autoloader.inc.php";
 
 use bundle\windows\Windows;
 use bundle\windows\Registry;
+use bundle\windows\Task;
 
 /*
 var_dump(['is_admin' => Windows::isAdmin()]);	
@@ -23,9 +24,10 @@ foreach($drives as $drive){
 	]]);
 }
 //*/
-
+/*
 $reg = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer')->readFully();
 foreach($reg as $r){
+	$r->path = 'хуй';
 	echo "\n\n[path] " . $r->path . " ################################\n";
 	foreach($r as $v){
 		$k = $v->value;
@@ -33,4 +35,13 @@ foreach($reg as $r){
 		$v->key = $k;
 		var_dump([$v->key => $v->value]);
 	}
-}
+}//*/
+
+
+$tasks = Task::exists('opera.exe');
+var_dump($tasks);
+//$tasks->kill();
+/*
+foreach($tasks as $task){
+	var_dump($task->toArray());
+}//*/
