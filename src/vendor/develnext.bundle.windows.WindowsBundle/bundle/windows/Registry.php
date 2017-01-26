@@ -34,6 +34,46 @@ class Registry
     }
     
     /**
+     * HKEY_CLASSES_ROOT
+     * @return Registry
+     */
+    public static function HKCR(){
+        return new self('HKEY_CLASSES_ROOT');
+    }
+
+    /**
+     * HKEY_CURRENT_USER
+     * @return Registry
+     */
+    public static function HKCU(){
+        return new self('HKEY_CURRENT_USER');
+    }
+
+    /**
+     * HKEY_LOCAL_MACHINE
+     * @return Registry
+     */
+    public static function HKLM(){
+        return new self('HKEY_LOCAL_MACHINE');
+    }
+
+    /**
+     * HKEY_USERS
+     * @return Registry
+     */
+    public static function HKU(){
+        return new self('HKEY_USERS');
+    }
+
+    /**
+     * HKEY_CURRENT_CONFIG
+     * @return Registry
+     */
+    public static function HKCC(){
+        return new self('HKEY_CURRENT_CONFIG');
+    }
+
+    /**
      * --RU--
      * Полное чтение содержимого раздела (ключ, значения, подразделы)
      * @param bool $recursive = false рекурсивное чтение из подразделов

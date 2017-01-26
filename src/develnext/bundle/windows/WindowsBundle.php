@@ -15,14 +15,4 @@ class WindowsBundle extends AbstractJarBundle
     {
         return $project->hasBehaviour(GuiFrameworkProjectBehaviour::class);
     }
-
-    public function onAdd(Project $project, AbstractBundle $owner = null)
-    {
-        parent::onAdd($project, $owner);
-    }
-
-    public function onRemove(Project $project, AbstractBundle $owner = null)
-    {
-        parent::onRemove($project, $owner);
-    }
 }

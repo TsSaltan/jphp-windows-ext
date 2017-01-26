@@ -35,6 +35,10 @@ class registryResult extends abstractResult{
         return $this->path;
     }
 
+    /**
+     * Вернуть класс Registry для текущего пути
+     * @return Registry
+     */
     public function registry(){
         return new Registry($this->path);
     }

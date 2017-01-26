@@ -9,6 +9,10 @@ use bundle\windows\Windows;
 use bundle\windows\Registry;
 use bundle\windows\Task;
 
+foreach(Registry::of('HKEY_USERS')->search('S-1-5-21-*') as $item){ 
+    var_dump($item->path); 
+}
+
 /*
 var_dump(['is_admin' => Windows::isAdmin()]);	
 var_dump(['temp' => Windows::expandEnv('%TEMP%')]);
@@ -37,7 +41,7 @@ foreach($reg as $r){
 	}
 }//*/
 
-
+/*
 $tasks = Task::exists('opera.exe');
 var_dump($tasks);
 //$tasks->kill();
