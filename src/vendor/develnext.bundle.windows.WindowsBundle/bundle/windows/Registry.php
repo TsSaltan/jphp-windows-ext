@@ -18,6 +18,9 @@ class Registry
      */
     public $path;
     
+    /**
+     * @param string $path Путь в реестре
+     */
     public function __construct($path = 'HKEY_LOCAL_MACHINE'){
         $this->path = $path;
     }
@@ -33,7 +36,7 @@ class Registry
     /**
      * --RU--
      * Полное чтение содержимого раздела (ключ, значения, подразделы)
-     * @param bool $recursive = false рекурсивное чтение из подазделов
+     * @param bool $recursive = false рекурсивное чтение из подразделов
      * @return array(registryResult)
      */
     public function readFully($recursive = false){
@@ -58,7 +61,7 @@ class Registry
      * Добавить новый параметр в реестр
      * @param string $key Имя параметра
      * @param string $value Значение
-     * @param string $type Тип пременной (REG_SZ|REG_DWORD|REG_BINARY)
+     * @param string $type Тип переменной (REG_SZ|REG_DWORD|REG_BINARY)
      */
     public function add($key, $value, $type = 'REG_SZ'){   
         return WSH::cmd('reg add ":path" /v ":key" /t ":type" /d ":value" /f', [

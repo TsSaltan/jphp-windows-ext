@@ -1,4 +1,5 @@
-**[Wiki](https://tssaltan.ru/1156.develnext-windows/?)**
+**[Wiki](https://tssaltan.ru/1156.develnext-windows/#wiki)**
+
 **[Тема на форуме](http://community.develstudio.org/showthread.php/13689-Модуль-для-работы-с-ОС-Windows)**
 
 ## Changelog
@@ -27,12 +28,6 @@
 
 
 ## Build
-Windows
-```
-gradlew.bat bundle
-```
-
-Linux
 ```
 gradlew bundle
 ```

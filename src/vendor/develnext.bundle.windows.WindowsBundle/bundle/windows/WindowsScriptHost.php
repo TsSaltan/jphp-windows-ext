@@ -45,9 +45,11 @@ class WindowsScriptHost
      * --RU--
      * Выполнить команду
      * @param string $command
-     * @param array $params=[]
-     * @param bool $saveCache=false
+     * @param array $params Параметры для замены (в запросе можно передать именованные параметры, как в PDO)
+     * @param bool $saveCache Хранить запрос в кеше
+     * @param string $charset Кодировка ответа
      * @return string
+     * @throws WindowsException
      */  
     public static function cmd($command, $params = [], $saveCache = false, $charset = 'cp866'){
         $command = Prepare::Query($command, $params);    
@@ -58,7 +60,9 @@ class WindowsScriptHost
      * --RU--
      * Сделать запрос к WMIC
      * @param string $query
+     * @param bool $saveCache Хранить запрос в кеше
      * @return array
+     * @throws WindowsException
      */
     public static function WMIC($query, $saveCache = false){
         $data = self::cmd('WMIC :query /Format:List | more', ['query' => $query], $saveCache);
@@ -78,11 +82,26 @@ class WindowsScriptHost
         return $return;
     }
     
-    public static function PowerShell($query){
+    /**
+     * --RU--
+     * Выполнить скрипт PowerShell (должен располагаться в одну строку)
+     * @param string $query
+     * @param array $params Параметры для замены
+     * @return string
+     * @throws WindowsException
+     */
+    public static function PowerShell($query, $params = []){
         $command = Prepare::Query($query, $params); 
         return self::Exec(['powershell.exe', '-inputformat', 'none', '-command', $command], true);  
     }
     
+    /**
+     * --RU--
+     * Выполнить скрипт vbScript (должен располагаться в одну строку)
+     * @param string $query
+     * @return string
+     * @throws WindowsException
+     */
     public static function vbScript($query){
         return self::cmd('mshta vbscript:Execute(":query")', ['query' => str::replace($query, '"', '""')]);
     }

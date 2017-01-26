@@ -28,7 +28,7 @@ class Startup
 
     /**
      * --RU--
-     * Добавляет программу в автозугрузку
+     * Добавляет программу в автозагрузку
      * @var string $file Команда для запуска
      * @var string $description=null Описание
      * @return startupItem
@@ -68,10 +68,20 @@ class Startup
         return self::find($file) !== false;
     }
 
+    /**
+     * --RU--
+     * Возвращает путь к пользовательской папке автозагрузки
+     * @return string
+     */
     public static function getUserStartupDirectory(){
         return realpath(Windows::expandEnv('%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup'));
     }
     
+    /**
+     * --RU--
+     * Возвращает путь к папке автозагрузки для программ
+     * @return string
+     */
     public static function getCommonStartupDirectory(){
         return realpath(Windows::expandEnv('%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup'));
     }

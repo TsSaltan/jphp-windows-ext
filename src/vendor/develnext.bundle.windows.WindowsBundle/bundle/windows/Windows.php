@@ -17,6 +17,12 @@ class Windows
 {
     const VERSION = '1.0.0.0';
 
+    /**
+     * --RU--
+     * Раскрывает системные переменные (%TEMP%, %APPDATA% и т.д.)
+     * @var string $string
+     * @return string
+     */
     public static function expandEnv($string){
         $reg = '%([^%]+)%';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE)->with($string);
@@ -110,6 +116,11 @@ class Windows
         return null;
     }
 
+    /**
+     * --RU--
+     * Получить список подключенных дисков и их характеристик
+     * @return array
+     */
     public static function getDrives(){
         return WSH::WMIC('path win32_logicaldisk get');
     }
@@ -118,7 +129,7 @@ class Windows
     /**
      * Get full information of current OS.
      * --RU--
-     * Получить всю информацию об оперативной системе
+     * Получить характеристики операционной системы
      * @return array
      */
     public static function getOS(){
@@ -128,7 +139,7 @@ class Windows
     /**
      * Get full information of current baseboard.
      * --RU--
-     * Получить всю информацию о материнской плате
+     * Получить характеристики материнской платы
      * @return string
      */
     public static function getMotherboard(){
@@ -138,7 +149,7 @@ class Windows
     /**
      * Return serial number of current mother board.
      * --RU--
-     * Получить сериальный номер материнской платы
+     * Получить серийный номер материнской платы
      * @return string
      */
     public static function getMotherboardSerial(){
@@ -210,7 +221,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить информацию о процессоре
+     * Получить характеристики процессора
      * @return string
      */
     public static function getCPU(){
@@ -255,7 +266,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить всю информацию о видеокартах
+     * Получить характеристики всех подключенных видеокарт
      * @return string
      */
     public static function getVideo(){
@@ -264,7 +275,7 @@ class Windows
 
     /**
      * --RU--
-     * Получить всю информацию о звуковых устройствах
+     * Получить характеристики звуковых устройств
      * @return string
      */
     public static function getSound(){
@@ -331,7 +342,7 @@ class Windows
 
     /**
      * --RU--
-     * Создание lnk-ярлыка (ссылки на файл)
+     * Создать lnk-ярлыка (ссылки на файл)
      * @var string $shortcut Расположение ярлыка
      * @var string $target Ссылка на файл
      * @var string $description=null Описание
@@ -347,7 +358,7 @@ class Windows
 
     /**
      * --RU--
-     * Возвращает ссылку на файл lnk-ярлыка
+     * Получить ссылку на файл lnk-ярлыка
      * @var string $shortcut Расположение ярлыка
      * @return string
      */
