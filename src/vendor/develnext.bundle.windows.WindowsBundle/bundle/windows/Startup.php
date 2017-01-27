@@ -50,7 +50,7 @@ class Startup
     public static function find($file){
         $list = self::getList();
         foreach($list as $item){
-            if($item->file() == $file){
+            if($item->file == $file){
                 return $item;
             }
         }

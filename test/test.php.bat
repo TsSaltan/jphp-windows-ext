@@ -6,46 +6,9 @@ include DIR . "autoloader.inc.php";
 ###
 
 use bundle\windows\Windows;
-use bundle\windows\Registry;
-use bundle\windows\Task;
 
-foreach(Registry::of('HKEY_USERS')->search('S-1-5-21-*') as $item){ 
-    var_dump($item->path); 
-}
-
-/*
 var_dump(['is_admin' => Windows::isAdmin()]);	
 var_dump(['temp' => Windows::expandEnv('%TEMP%')]);
+var_dump(['appData' => Windows::expandEnv('%appdata%')]);
 var_dump(['arch' => Windows::getArch()]);
 var_dump(['uuid' => Windows::getUUID()]);
-
-$drives = Windows::getDrives();	
-foreach($drives as $drive){
-	var_dump([$drive['Name'] => [
-		'title' => $drive['VolumeName'],
-		'description' => $drive['Description'],
-		'serial' => Windows::getDriveSerial($drive['Name'])
-	]]);
-}
-//*/
-/*
-$reg = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer')->readFully();
-foreach($reg as $r){
-	$r->path = 'хуй';
-	echo "\n\n[path] " . $r->path . " ################################\n";
-	foreach($r as $v){
-		$k = $v->value;
-		$v->value = $v->key;
-		$v->key = $k;
-		var_dump([$v->key => $v->value]);
-	}
-}//*/
-
-/*
-$tasks = Task::exists('opera.exe');
-var_dump($tasks);
-//$tasks->kill();
-/*
-foreach($tasks as $task){
-	var_dump($task->toArray());
-}//*/
