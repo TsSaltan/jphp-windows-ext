@@ -5,7 +5,21 @@
 ## Changelog
 ```
 --- 1.0 ---
-... in progress
+[Change] Изменена функция обращения к системному API 
+[Change] Функции для работы с реестром (regRead, regSub, regDelete, regAdd) перемещены в отдельный класс Registry
+[Change] Функции для работы с автозапуском (startupAdd, startupDelete, startupCheck, startupGet) перемещены в отдельный класс Startup
+[Change] Функции для работы с процессами (getTaskList, taskKill, taskExists) перемещены в отдельный класс Task
+[Fix] Windows::getDriveSerial() возвращал некорректное значение
+[Add] Работа с lnk ярлыками Windows::createShortcut(), Windows::getShortcutTarget()
+[Del] Удалены из ресурсов все скрипты и сторонние утилиты
+[Del] Windows::getProductKey() - работала не на всех системах
+[Del] Windows::setVolume() - работала не на всех системах
+[Del] Windows::setBrightness() - работала не на всех системах
+[Del] Windows::getInstalledSoftware()
+[Del] Windows::emptyBin()
+[Del] Windows::scanNetwork()
+[Del] Windows::getInstallTime()
+[Del] WindowsScriptHost::jScript()
 
 --- 0.5 ---
 [Change] Модуль переделан в пакет расширений
