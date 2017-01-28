@@ -39,3 +39,6 @@ foreach($search as $items){
 		echo $item->key . ' = ' . $item->value . "\n";
 	}
 }
+
+$version = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Internet Explorer')->read('Version')->value;
+var_dump('IE Version: ' . $version);

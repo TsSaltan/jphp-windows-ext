@@ -14,10 +14,10 @@ use php\util\Regex;
 class WindowsScriptHost
 {
     protected static function Exec($cmd, $wait = false, $saveCache = false, $charset = 'cp1251'){
-        Logger::debug('[WSH::Exec] ' . implode(' ', $cmd));
+        // Logger::debug('[WSH::Exec] ' . implode(' ', $cmd));
 
         if($saveCache and $a = self::isCached($cmd)){
-            Logger::debug('[WSH::Exec] Read from cache');
+            // Logger::debug('[WSH::Exec] Read from cache');
             return $a;
         }
 
@@ -35,7 +35,7 @@ class WindowsScriptHost
         }
         
         if($saveCache){
-            Logger::debug('[WSH::Exec] Save to cache');
+            // Logger::debug('[WSH::Exec] Save to cache');
             self::cache($cmd, $output);
         }
         return $output;
