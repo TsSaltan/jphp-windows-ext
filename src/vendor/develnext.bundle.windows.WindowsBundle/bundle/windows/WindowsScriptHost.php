@@ -13,13 +13,8 @@ use php\util\Regex;
 
 class WindowsScriptHost
 {
-    protected static function Exec($cmd, $wait = false, $saveCache = false, $charset = 'cp1251'){
-        // Logger::debug('[WSH::Exec] ' . implode(' ', $cmd));
-
-        if($saveCache and $a = self::isCached($cmd)){
-            // Logger::debug('[WSH::Exec] Read from cache');
-            return $a;
-        }
+    protected static function Exec($cmd, $wait = false, $charset = 'cp1251'){
+        //Logger::Info('[WSH::Exec] ' . implode(' ', $cmd));
 
         $cmd = (!is_array($cmd)) ? [$cmd] : $cmd;
         
@@ -34,10 +29,6 @@ class WindowsScriptHost
             throw new WindowsException('WindowsScriptHost Error: ' . $error);
         }
         
-        if($saveCache){
-            // Logger::debug('[WSH::Exec] Save to cache');
-            self::cache($cmd, $output);
-        }
         return $output;
     }
   
@@ -46,26 +37,24 @@ class WindowsScriptHost
      * Выполнить команду
      * @param string $command
      * @param array $params Параметры для замены (в запросе можно передать именованные параметры, как в PDO)
-     * @param bool $saveCache Хранить запрос в кеше
      * @param string $charset Кодировка ответа
      * @return string
      * @throws WindowsException
      */  
-    public static function cmd($command, $params = [], $saveCache = false, $charset = 'cp866'){
+    public static function cmd($command, $params = [], $charset = 'cp866'){
         $command = Prepare::Query($command, $params);    
-        return self::Exec(['cmd.exe', '/c', $command], true, $saveCache, $charset);  
+        return self::Exec(['cmd.exe', '/c', $command], true, $charset);  
     }
     
     /**
      * --RU--
      * Сделать запрос к WMIC
      * @param string $query
-     * @param bool $saveCache Хранить запрос в кеше
      * @return array
      * @throws WindowsException
      */
-    public static function WMIC($query, $saveCache = false){
-        $data = self::cmd('WMIC :query /Format:List | more', ['query' => $query], $saveCache);
+    public static function WMIC($query){
+        $data = self::cmd('WMIC :query /Format:List | more', ['query' => $query]);
 
         $reg = '([^\n=]+)=([^\n\r]+)';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($data);
@@ -90,9 +79,9 @@ class WindowsScriptHost
      * @return string
      * @throws WindowsException
      */
-    public static function PowerShell($query, $params = []){
+    public static function PowerShell($query, $params = [], $wait = true){
         $command = Prepare::Query($query, $params); 
-        return self::Exec(['powershell.exe', '-inputformat', 'none', '-command', $command], true);  
+        return self::Exec(['powershell.exe', '-inputformat', 'none', '-command', $command], $wait);  
     }
     
     /**
@@ -104,24 +93,5 @@ class WindowsScriptHost
      */
     public static function vbScript($query){
         return self::cmd('mshta vbscript:Execute(":query")', ['query' => str::replace($query, '"', '""')]);
-    }
-
-    protected static $cacheLive = 60, // sec
-                     $cached = [];
-                     
-    protected static function isCached($command){
-        $key = str::hash(implode(' ', $command), 'MD5');
-
-        if(array_key_exists($key, self::$cached) and self::$cached[$key]['live'] > time()){
-            return self::$cached[$key]['answer'];
-        } else {
-            return false;
-        }
-    }
-
-    protected static function cache($command, $answer){
-        $command = is_array($command) ? implode(' ', $command) : $command;
-        $key = str::hash($command, 'MD5');
-        self::$cached[$key] = ['answer' => $answer, 'live' => (time() + self::$cacheLive)];
     }
 }

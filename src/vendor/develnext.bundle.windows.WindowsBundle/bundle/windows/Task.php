@@ -85,7 +85,7 @@ class Task
 
     private static function exec($filter = false){
         // cp изменит вывод на английский язык
-        $list = WSH::cmd('chcp 65001 | tasklist /V /FO CSV /NH' . ($filter === false ? '' : ' /FI ":filter"'), ['filter' => $filter], false, 'utf-8');
+        $list = WSH::cmd('chcp 65001 | tasklist /V /FO CSV /NH' . ($filter === false ? '' : ' /FI ":filter"'), ['filter' => $filter], 'utf-8');
         return self::parseAnswer($list);
     }
 

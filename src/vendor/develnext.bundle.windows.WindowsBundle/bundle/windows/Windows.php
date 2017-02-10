@@ -15,7 +15,7 @@ use Exception;
 
 class Windows
 {
-    const VERSION = '1.0.0.0';
+    const VERSION = '1.1.0.0';
 
     /**
      * --RU--
@@ -96,8 +96,8 @@ class Windows
      */
     public static function getDriveSerial($drive){
         $drive = str::endsWith($drive, ':') ? $drive : $drive . ':';
-        $parts = WSH::WMIC('path Win32_LogicalDiskToPartition get', true);
-        $devices = WSH::WMIC('path Win32_PhysicalMedia get', true);
+        $parts = WSH::WMIC('path Win32_LogicalDiskToPartition get');
+        $devices = WSH::WMIC('path Win32_PhysicalMedia get');
 
         foreach($parts as $part){
             if(str::contains($part['Dependent'], '"' . $drive . '"')){
@@ -133,7 +133,7 @@ class Windows
      * @return array
      */
     public static function getOS(){
-        return WSH::WMIC('OS get', true)[0];
+        return WSH::WMIC('OS get')[0];
     }
 
     /**
@@ -143,7 +143,7 @@ class Windows
      * @return string
      */
     public static function getMotherboard(){
-        return WSH::WMIC('baseboard get', true)[0];
+        return WSH::WMIC('baseboard get')[0];
     }
 
     /**
@@ -153,7 +153,7 @@ class Windows
      * @return string
      */
     public static function getMotherboardSerial(){
-        return WSH::WMIC('baseboard get SerialNumber', true)[0]['SerialNumber'];
+        return WSH::WMIC('baseboard get SerialNumber')[0]['SerialNumber'];
     }
 
     /**
@@ -162,7 +162,7 @@ class Windows
      * @return string
      */
     public static function getMotherboardManufacturer(){
-        return WSH::WMIC('baseboard get Manufacturer', true)[0]['Manufacturer'];
+        return WSH::WMIC('baseboard get Manufacturer')[0]['Manufacturer'];
     }
 
     /**
@@ -171,7 +171,7 @@ class Windows
      * @return string
      */
     public static function getMotherboardProduct(){
-        return WSH::WMIC('baseboard get Product', true)[0]['Product'];
+        return WSH::WMIC('baseboard get Product')[0]['Product'];
     }
 
     /**
@@ -180,7 +180,7 @@ class Windows
      * @return string
      */
     public static function getCpuVoltage(){
-        return WSH::WMIC('CPU get CurrentVoltage', true)[0]['CurrentVoltage'];
+        return WSH::WMIC('CPU get CurrentVoltage')[0]['CurrentVoltage'];
     }
 
     /**
@@ -189,16 +189,16 @@ class Windows
      * @return string
      */
     public static function getCpuManufacturer(){
-        return WSH::WMIC('CPU get Manufacturer', true)[0]['Manufacturer'];
+        return WSH::WMIC('CPU get Manufacturer')[0]['Manufacturer'];
     }
 
     /**
      * --RU--
-     * Получить частоту процессора
+     * Получить максимальную частоту процессора
      * @return string
      */
     public static function getCpuFrequency(){
-        return WSH::WMIC('CPU get MaxClockSpeed', true)[0]['MaxClockSpeed'];
+        return WSH::WMIC('CPU get MaxClockSpeed')[0]['MaxClockSpeed'];
     }
 
     /**
@@ -207,7 +207,7 @@ class Windows
      * @return string
      */
     public static function getCpuSerial(){
-        return WSH::WMIC('CPU get ProcessorId', true)[0]['ProcessorId'];
+        return WSH::WMIC('CPU get ProcessorId')[0]['ProcessorId'];
     }
 
     /**
@@ -216,7 +216,7 @@ class Windows
      * @return string
      */
     public static function getCpuProduct(){
-        return WSH::WMIC('CPU get Name', true)[0]['Name'];
+        return WSH::WMIC('CPU get Name')[0]['Name'];
     }
 
     /**
@@ -225,7 +225,7 @@ class Windows
      * @return string
      */
     public static function getCPU(){
-        return WSH::WMIC('CPU get', true)[0];
+        return WSH::WMIC('CPU get')[0];
     }
 
     /**
@@ -234,7 +234,7 @@ class Windows
      * @return string
      */
     public static function getVideoProduct(){
-        return WSH::WMIC('Path Win32_VideoController Get VideoProcessor', true)[0]['VideoProcessor'];
+        return WSH::WMIC('Path Win32_VideoController Get VideoProcessor')[0]['VideoProcessor'];
     }
 
     /**
@@ -243,7 +243,7 @@ class Windows
      * @return string
      */
     public static function getVideoManufacturer(){
-        return WSH::WMIC('Path Win32_VideoController Get AdapterCompatibility', true)[0]['AdapterCompatibility'];
+        return WSH::WMIC('Path Win32_VideoController Get AdapterCompatibility')[0]['AdapterCompatibility'];
     }
 
     /**
@@ -252,7 +252,7 @@ class Windows
      * @return string
      */
     public static function getVideoRAM(){
-        return WSH::WMIC('Path Win32_VideoController Get AdapterRAM', true)[0]['AdapterRAM'];
+        return WSH::WMIC('Path Win32_VideoController Get AdapterRAM')[0]['AdapterRAM'];
     }
 
     /**
@@ -261,7 +261,7 @@ class Windows
      * @return string
      */
     public static function getVideoMode(){
-        return WSH::WMIC('Path Win32_VideoController Get VideoModeDescription', true)[0]['VideoModeDescription'];
+        return WSH::WMIC('Path Win32_VideoController Get VideoModeDescription')[0]['VideoModeDescription'];
     }
 
     /**
@@ -270,7 +270,7 @@ class Windows
      * @return string
      */
     public static function getVideo(){
-        return WSH::WMIC('Path Win32_VideoController Get', true);
+        return WSH::WMIC('Path Win32_VideoController Get');
     }
 
     /**
@@ -279,7 +279,7 @@ class Windows
      * @return string
      */
     public static function getSound(){
-        return WSH::WMIC('Sounddev Get', true);
+        return WSH::WMIC('Sounddev Get');
     }
 
     /**
@@ -288,7 +288,7 @@ class Windows
      * @return string
      */
     public static function getUUID(){
-        return WSH::WMIC('path win32_computersystemproduct get', true)[0]['UUID'];
+        return WSH::WMIC('path win32_computersystemproduct get')[0]['UUID'];
         //return WSH::PowerShell('get-wmiobject Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID');
     }
 
@@ -312,13 +312,23 @@ class Windows
     }
     
     /**
+     * Количество миллисекунд с момента запуска системы
+     * @var int
+     */
+    protected static $bootupTime;
+
+    /**
      * --RU--
      * Получить метку времени (в миллисекундах) запуска системы
      * @return int
      */
     public static function getBootUptime(){
-        $data = explode('.', WSH::WMIC('Os Get LastBootUpTime', true)[0]['LastBootUpTime'])[0];
-        return (new TimeFormat('yyyyMMddHHmmss'))->parse($data)->getTime();
+        if(is_null(self::$bootupTime)){
+            $data = explode('.', WSH::WMIC('Os Get LastBootUpTime')[0]['LastBootUpTime'])[0];
+            self::$bootupTime = (new TimeFormat('yyyyMMddHHmmss'))->parse($data)->getTime();
+        }
+        
+        return self::$bootupTime;
     }
 
     /**
@@ -337,7 +347,68 @@ class Windows
      * @return array
      */
     public static function getBatteryInfo(){
-        return WSH::WMIC('Path Win32_Battery Get')[0];
+        try{
+            return WSH::WMIC('Path Win32_Battery Get')[0];
+        } catch (\Exception $e){
+            throw new WindowsException('Battery does not support');
+        }
+    }
+
+    /**
+     * --RU--
+     * Получить предположительное оставшееся время работы в миллисекундах (на основе данных об батарее)
+     * (при зарядке АКБ могут быть слишком большие значения)
+     * @return int
+     * @throws WindowsException
+     */
+    public static function getBatteryTimeRemaining(){
+        try{
+            return ((int) WSH::WMIC('Path Win32_Battery Get EstimatedRunTime')[0]['EstimatedRunTime']) * 60 * 1000;
+        } catch (\Exception $e){
+            throw new WindowsException('Battery does not support');
+        }
+    }
+
+    /**
+     * --RU--
+     * Получить процент заряда батареи
+     * @return int
+     * @throws WindowsException
+     */
+    public static function getBatteryPercent(){
+        try{
+            return ++(WSH::WMIC('Path Win32_Battery Get EstimatedChargeRemaining')[0]['EstimatedChargeRemaining']);
+        } catch (\Exception $e){
+            throw new WindowsException('Battery does not support');
+        }
+    }
+
+    /**
+     * --RU--
+     * Получить напряжение батареи (мВ)
+     * @return int
+     * @throws WindowsException
+     */
+    public static function getBatteryVoltage(){
+        try{
+            return (int) WSH::WMIC('Path Win32_Battery Get DesignVoltage')[0]['DesignVoltage'];
+        } catch (\Exception $e){
+            throw new WindowsException('Battery does not support');
+        }
+    }
+
+    /**
+     * --RU--
+     * Находится ли батарея на зарядке
+     * @return int
+     * @throws WindowsException
+     */
+    public static function isBatteryCharging(){
+        try{
+            return ((int)WSH::WMIC('Path Win32_Battery Get BatteryStatus')[0]['BatteryStatus']) > 1;
+        } catch (\Exception $e){
+            throw new WindowsException('Battery does not support');
+        }
     }
 
     /**
@@ -374,5 +445,141 @@ class Windows
     public static function speak($text){
         return WSH::vbScript('CreateObject("SAPI.SpVoice").Speak("'.$text.'")(window.close)');
     }
+
+    /**
+     * --RU--
+     * Установить уровень яркости (Windows 10 only)
+     * @param int $level
+     * @param int $time
+     * @throws WindowsException
+     */
+    public static function setBrightnessLevel($level, $time = 1){
+        try{
+            WSH::PowerShell('(Get-WmiObject -Namespace root/WMI -Class WmiMonitorBrightnessMethods).WmiSetBrightness(:time, :level)', ['time' => 1, 'level' => $level], false);
+            return true;
+        } catch (\Exception $e){
+            throw new WindowsException('Video driver does not support changing the brightness level');
+        }
+    }
+
+    /**
+     * --RU--
+     * Получить уровень яркости (Windows 10 only)
+     * @return int
+     * @throws WindowsException
+     */
+    public static function getBrightnessLevel(){
+        try{
+            return (int) WSH::PowerShell('Get-Ciminstance -Namespace root/WMI -ClassName WmiMonitorBrightness | select -ExpandProperty CurrentBrightness');
+        } catch (\Exception $e){
+            throw new WindowsException('Video driver does not support changing the brightness level');
+        }
+    }
+
+    /**
+     * --RU--
+     * Установить уровень громкости (Windows 10 only)
+     * @param int $level Уровень от 0 до 100
+     * @throws WindowsException
+     */
+    public static function setVolumeLevel($level){
+        return self::psAudioQuery('Volume', $level/100);     
+    }
+
+    /**
+     * --RU--
+     * Получить уровень громкости (Windows 10 only)
+     * @return int
+     * @throws WindowsException
+     */
+    public static function getVolumeLevel(){
+        $vol = self::psAudioQuery('Volume');
+        $vol = floatval(str_replace(',', '.', $vol));
+        return (int)($vol * 100);     
+    }
+
+
+    /**
+     * --RU--
+     * Включиь / выключить режим "без звука"
+     * @param bool $value
+     * @throws WindowsException
+     */
+    public static function setMute($value){
+        return self::psAudioQuery('Mute', ($value ? 1 : 0));     
+    }
+
+    /**
+     * --RU--
+     * Проверить, включен ли режим "без звука"
+     * @return bool
+     * @throws WindowsException
+     */
+    public static function getMute(){
+        return self::psAudioQuery('Mute') == 'True';     
+    }
+
+    private static $psAudioClass = <<<PS
+        using System.Runtime.InteropServices;
+     
+        [Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        interface IAudioEndpointVolume {
+          // f(), g(), ... are unused COM method slots. Define these if you care
+          int f(); int g(); int h(); int i();
+          int SetMasterVolumeLevelScalar(float fLevel, System.Guid pguidEventContext);
+          int j();
+          int GetMasterVolumeLevelScalar(out float pfLevel);
+          int k(); int l(); int m(); int n();
+          int SetMute([MarshalAs(UnmanagedType.Bool)] bool bMute, System.Guid pguidEventContext);
+          int GetMute(out bool pbMute);
+        }
+        [Guid("D666063F-1587-4E43-81F1-B948E807363F"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        interface IMMDevice {
+          int Activate(ref System.Guid id, int clsCtx, int activationParams, out IAudioEndpointVolume aev);
+        }
+        [Guid("A95664D2-9614-4F35-A746-DE8DB63617E6"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        interface IMMDeviceEnumerator {
+          int f(); // Unused
+          int GetDefaultAudioEndpoint(int dataFlow, int role, out IMMDevice endpoint);
+        }
+        [ComImport, Guid("BCDE0395-E52F-467C-8E3D-C4579291692E")] class MMDeviceEnumeratorComObject { }
+         
+        public class Audio {
+          static IAudioEndpointVolume Vol() {
+            var enumerator = new MMDeviceEnumeratorComObject() as IMMDeviceEnumerator;
+            IMMDevice dev = null;
+            Marshal.ThrowExceptionForHR(enumerator.GetDefaultAudioEndpoint(/*eRender*/ 0, /*eMultimedia*/ 1, out dev));
+            IAudioEndpointVolume epv = null;
+            var epvid = typeof(IAudioEndpointVolume).GUID;
+            Marshal.ThrowExceptionForHR(dev.Activate(ref epvid, /*CLSCTX_ALL*/ 23, 0, out epv));
+            return epv;
+          }
+          public static float Volume {
+            get {float v = -1; Marshal.ThrowExceptionForHR(Vol().GetMasterVolumeLevelScalar(out v)); return v;}
+            set {Marshal.ThrowExceptionForHR(Vol().SetMasterVolumeLevelScalar(value, System.Guid.Empty));}
+          }
+          public static bool Mute {
+            get { bool mute; Marshal.ThrowExceptionForHR(Vol().GetMute(out mute)); return mute; }
+            set { Marshal.ThrowExceptionForHR(Vol().SetMute(value, System.Guid.Empty)); }
+          }
+        }
+PS;
+
+    private static function psAudioQuery($key, $value = null){
+        //try{            
+            $params['class'] = base64_encode(str_replace(["\t", "  "], '', self::$psAudioClass));
+            $params['key'] = $key;
+            $params['value'] = $value;
+
+            return WSH::PowerShell(
+                '[string]$code = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\':class\')); '.
+                'Add-Type -Language CSharpVersion3 -TypeDefinition $code; [ audio ]:::key'. (!is_null($value) ? ' = :value' : ''),
+                $params
+            );
+       /* } catch (\Exception $e){
+            //throw new WindowsException('Audio driver does not support changing the volume param');
+        }*/
+    }
+
 
 }
