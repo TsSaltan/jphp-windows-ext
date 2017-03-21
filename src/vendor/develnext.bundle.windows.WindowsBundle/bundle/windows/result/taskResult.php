@@ -4,6 +4,9 @@ namespace bundle\windows\result;
 use bundle\windows\result\abstractResult;
 use bundle\windows\result\taskItem;
 
+/**
+ * Экземпляр класса содержит список процессов, который был сформирован в одном из методов класса Task
+ */
 class taskResult extends abstractResult{
     public function addItem($params){
         $this->data[] = new taskItem(
@@ -21,7 +24,7 @@ class taskResult extends abstractResult{
 
     /**
      * --RU--
-     * Завершить процесс
+     * Завершить процессы
      * @throws WindowsException
      */
     public function kill(){

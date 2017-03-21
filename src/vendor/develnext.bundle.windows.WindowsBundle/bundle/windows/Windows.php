@@ -15,13 +15,17 @@ use Exception;
 
 class Windows
 {
+    /**
+     * Текущая версия пакета
+     */
     const VERSION = '1.1.0.0';
 
     /**
      * --RU--
      * Раскрывает системные переменные (%TEMP%, %APPDATA% и т.д.)
-     * @var string $string
+     * @param string $string
      * @return string
+     * @example Windows: :expandEnv('%programdata%\\Windows\\'); // string(23) "C:\ProgramData\Windows\"
      */
     public static function expandEnv($string){
         $reg = '%([^%]+)%';
@@ -68,7 +72,7 @@ class Windows
     
     /**
      * Получить разрядность системы
-     * @return string (x64|x86)
+     * @return string 'x64' или 'x86'
      */
     public static function getArch()
     {
@@ -90,7 +94,7 @@ class Windows
     /**
      * Return serial number of a drive.
      * --RU--
-     * Получить сериальный номер носителя
+     * Получить серийный номер носителя
      * @param string $drive Буква диска
      * @return string
      */
@@ -119,7 +123,7 @@ class Windows
     /**
      * --RU--
      * Получить список подключенных дисков и их характеристик
-     * @return array
+     * @return array Двумерный массив с характеристиками каждого подключенного диска
      */
     public static function getDrives(){
         return WSH::WMIC('path win32_logicaldisk get');
@@ -130,7 +134,7 @@ class Windows
      * Get full information of current OS.
      * --RU--
      * Получить характеристики операционной системы
-     * @return array
+     * @return array Массив с параметрами текущей операционной системы
      */
     public static function getOS(){
         return WSH::WMIC('OS get')[0];
@@ -284,12 +288,49 @@ class Windows
 
     /**
      * --RU--
+     * Получить характеристики устройств оперативной памяти
+     * @return array
+     */
+    public static function getRAM(){
+        return WSH::WMIC('path Win32_PhysicalMemory get');
+    }
+
+    /**
+     * --RU--
+     * Получить объем оперативной памяти
+     * @return int
+     */
+    public static function getTotalRAM(){
+        return intval(WSH::WMIC('path Win32_ComputerSystem get TotalPhysicalMemory')[0]['TotalPhysicalMemory']);
+    }
+
+    /**
+     * --RU--
      * Получить уникальный UUID системы
      * @return string
      */
     public static function getUUID(){
         return WSH::WMIC('path win32_computersystemproduct get')[0]['UUID'];
         //return WSH::PowerShell('get-wmiobject Win32_ComputerSystemProduct | Select-Object -ExpandProperty UUID');
+    }
+
+    /**
+     * --RU--
+     * Получить информацию о BIOS
+     * @return array
+     */
+    public static function getBIOS(){
+        return WSH::WMIC('path Win32_BIOS get')[0];
+    }
+
+    /**
+     * --RU--
+     * Получить массив принтеров и их характеристики
+     * @return array
+     * @todo add Win32_PrintJob 
+     */
+    public static function getPrinter(){
+        return WSH::WMIC('path Win32_Printer get')[0];
     }
 
     /**
@@ -319,8 +360,8 @@ class Windows
 
     /**
      * --RU--
-     * Получить метку времени (в миллисекундах) запуска системы
-     * @return int
+     * Получить время запуска системы
+     * @return int метка времени в миллисекундах
      */
     public static function getBootUptime(){
         if(is_null(self::$bootupTime)){
@@ -333,8 +374,12 @@ class Windows
 
     /**
      * --RU--
-     * Получить метку времени (в миллисекундах) работы системы
-     * @return int
+     * Получить время работы системы
+     * @return int миллисекунды
+     * @example $bootTime = Windows::getUptime(); 
+     *          $time = new Time($bootTime, TimeZone::UTC()); 
+     *          var_dump('ПК работает: ' . ($time->day() - 1) . ' дней ' . $time->hourOfDay() . ' часов ' . $time->minute() . ' минут ' . $time->second() . ' секунд'); 
+     *          // string(46) "ПК работает: 0 дней 1 часов 20 минут 36 секунд"
      */
     public static function getUptime(){
         return Time::Now()->getTime() - self::getBootUptime();
@@ -356,14 +401,13 @@ class Windows
 
     /**
      * --RU--
-     * Получить предположительное оставшееся время работы в миллисекундах (на основе данных об батарее)
-     * (при зарядке АКБ могут быть слишком большие значения)
-     * @return int
+     * Получить предположительное оставшееся время работы.
+     * @return int миллисекунды. В процессе зарядки АКБ функция может возвращать слишком большие значения
      * @throws WindowsException
      */
     public static function getBatteryTimeRemaining(){
         try{
-            return ((int) WSH::WMIC('Path Win32_Battery Get EstimatedRunTime')[0]['EstimatedRunTime']) * 60 * 1000;
+            return intval(WSH::WMIC('Path Win32_Battery Get EstimatedRunTime')[0]['EstimatedRunTime']) * 60 * 1000;
         } catch (\Exception $e){
             throw new WindowsException('Battery does not support');
         }
@@ -372,7 +416,7 @@ class Windows
     /**
      * --RU--
      * Получить процент заряда батареи
-     * @return int
+     * @return int Значение от 0 до 100
      * @throws WindowsException
      */
     public static function getBatteryPercent(){
@@ -385,8 +429,8 @@ class Windows
 
     /**
      * --RU--
-     * Получить напряжение батареи (мВ)
-     * @return int
+     * Получить напряжение батареи
+     * @return int милливольты
      * @throws WindowsException
      */
     public static function getBatteryVoltage(){
@@ -400,7 +444,7 @@ class Windows
     /**
      * --RU--
      * Находится ли батарея на зарядке
-     * @return int
+     * @return bool
      * @throws WindowsException
      */
     public static function isBatteryCharging(){
@@ -413,11 +457,10 @@ class Windows
 
     /**
      * --RU--
-     * Создать lnk-ярлыка (ссылки на файл)
-     * @var string $shortcut Расположение ярлыка
-     * @var string $target Ссылка на файл
-     * @var string $description=null Описание
-     * @return null
+     * Создать lnk-ярлык (ссылку на файл)
+     * @param string $shortcut Расположение ярлыка
+     * @param string $target Ссылка на файл
+     * @param string $description=null Описание
      */
     public static function createShortcut($shortcut, $target, $description = null){
         return WSH::PowerShell('$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut(\':shortcut\'); $S.TargetPath = \':target\'; $S.Description = \':description\'; $S.Save()', [
@@ -430,7 +473,7 @@ class Windows
     /**
      * --RU--
      * Получить ссылку на файл lnk-ярлыка
-     * @var string $shortcut Расположение ярлыка
+     * @param string $shortcut Расположение ярлыка
      * @return string
      */
     public static function getShortcutTarget($shortcut){
@@ -449,8 +492,8 @@ class Windows
     /**
      * --RU--
      * Установить уровень яркости (Windows 10 only)
-     * @param int $level
-     * @param int $time
+     * @param int $level уровень яркости от 0 до 100
+     * @param int $time=1 время в миллисекундах, за которое будет изменет уровень яркости
      * @throws WindowsException
      */
     public static function setBrightnessLevel($level, $time = 1){
@@ -465,7 +508,7 @@ class Windows
     /**
      * --RU--
      * Получить уровень яркости (Windows 10 only)
-     * @return int
+     * @return int уровень яркости от 0 до 100
      * @throws WindowsException
      */
     public static function getBrightnessLevel(){
@@ -479,7 +522,7 @@ class Windows
     /**
      * --RU--
      * Установить уровень громкости (Windows 10 only)
-     * @param int $level Уровень от 0 до 100
+     * @param int $level уровень от 0 до 100
      * @throws WindowsException
      */
     public static function setVolumeLevel($level){
@@ -489,7 +532,7 @@ class Windows
     /**
      * --RU--
      * Получить уровень громкости (Windows 10 only)
-     * @return int
+     * @return int уровень от 0 до 100
      * @throws WindowsException
      */
     public static function getVolumeLevel(){
@@ -501,7 +544,7 @@ class Windows
 
     /**
      * --RU--
-     * Включиь / выключить режим "без звука"
+     * Включить / выключить режим "без звука"
      * @param bool $value
      * @throws WindowsException
      */
@@ -524,7 +567,6 @@ class Windows
      
         [Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
         interface IAudioEndpointVolume {
-          // f(), g(), ... are unused COM method slots. Define these if you care
           int f(); int g(); int h(); int i();
           int SetMasterVolumeLevelScalar(float fLevel, System.Guid pguidEventContext);
           int j();

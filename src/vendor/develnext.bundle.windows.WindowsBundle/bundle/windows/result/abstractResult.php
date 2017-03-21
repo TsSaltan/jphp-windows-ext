@@ -7,6 +7,10 @@ abstract class abstractResult implements Iterator{
 
     protected $data = [];
 
+    /**
+     * @param mixed $key
+     * @param mixed $value
+     */
     public function add($key, $value){
         $this->data[$key] = $value;
     }

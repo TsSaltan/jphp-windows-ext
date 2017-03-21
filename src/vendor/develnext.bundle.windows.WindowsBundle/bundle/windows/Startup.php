@@ -7,13 +7,15 @@ use php\lib\str;
 use php\util\Regex;
 use bundle\windows\WindowsScriptHost as WSH;
 
-
+/**
+ * Класс содержит функции для работы с автозапуском
+ */
 class Startup 
 {    
     /**
      * --RU--
      * Получить список программ, находящихся в автозагрузке
-     * @return array[startupItem]
+     * @return array массив экземпляров класса \result\startupItem
      */
     public static function getList(){
         $items = WSH::WMIC('startup get');
@@ -29,23 +31,23 @@ class Startup
     /**
      * --RU--
      * Добавляет программу в автозагрузку
-     * @var string $file Команда для запуска
-     * @var string $description=null Описание
-     * @return startupItem
+     * @param string $file Команда для запуска
+     * @param string $description=null Описание
+     * @return \result\startupItem
      */
     public static function add($file, $description = null){
         $dir = self::getUserStartupDirectory();
         $basename = basename($file);
         Windows::createShortcut($dir . '\\' . $basename . '.lnk', $file, $description);
         return self::find($file);
-        return new startupItem($basename, $basename . '.lnk', 'Startup');
+        //return new startupItem($basename, $basename . '.lnk', 'Startup');
     }
 
     /**
      * --RU--
      * Найти запись в автозапуске по исполняемому файлу
-     * @var string $file Путь к исполняемому файлу
-     * @return startupItem|false
+     * @param string $file Путь к исполняемому файлу
+     * @return \result\startupItem|false в случае ошибки возвращает false
      */
     public static function find($file){
         $list = self::getList();
@@ -61,7 +63,7 @@ class Startup
     /**
      * --RU--
      * Находится ли данный файл в автозапуске
-     * @var string $file Путь к исполняемому файлу
+     * @param string $file Путь к исполняемому файлу
      * @return bool
      */
     public static function isExists($file){

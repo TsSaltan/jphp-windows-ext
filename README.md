@@ -1,9 +1,29 @@
-**[Wiki](https://tssaltan.ru/1156.develnext-windows/#wiki)**
+**[Home](https://tssaltan.ru/1156.develnext-windows/#wiki)**
+
+**[Wiki](https://github.com/TsSaltan/DevelNext-Windows/wiki/)**
 
 **[Тема на форуме](http://community.develstudio.org/showthread.php/13689-Модуль-для-работы-с-ОС-Windows)**
 
 ## Changelog
 ```
+--- 1.1 ---
+[Change] Создана подробная документация
+[Change] Disable WMIC cache
+[Add] Windows::getBatteryTimeRemaining()
+[Add] Windows::getBatteryPercent()
+[Add] Windows::getBatteryVoltage()
+[Add] Windows::isBatteryCharging()
+[Add] Windows::setBrightnessLevel()
+[Add] Windows::getBrightnessLevel()
+[Add] Windows::setVolumeLevel()
+[Add] Windows::getVolumeLevel()
+[Add] Windows::setMute()
+[Add] Windows::getMute()
+[Add] Windows::getRAM()
+[Add] Windows::getTotalRAM()
+[Add] Windows::getBIOS()
+[Add] Windows::getPrinter()
+
 --- 1.0 ---
 [Change] Изменена функция обращения к системному API 
 [Change] Функции для работы с реестром (regRead, regSub, regDelete, regAdd) перемещены в отдельный класс Registry

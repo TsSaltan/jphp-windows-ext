@@ -10,7 +10,9 @@ use php\lang\Process;
 use php\lib\str;
 use php\util\Regex;
 
-
+/**
+ * Методы класса позволяют вызывать функции API Windows, выполнять системные скрипты
+ */
 class WindowsScriptHost
 {
     protected static function Exec($cmd, $wait = false, $charset = 'cp1251'){
@@ -36,8 +38,8 @@ class WindowsScriptHost
      * --RU--
      * Выполнить команду
      * @param string $command
-     * @param array $params Параметры для замены (в запросе можно передать именованные параметры, как в PDO)
-     * @param string $charset Кодировка ответа
+     * @param array $params=array() параметры для замены (в запросе можно передать именованные параметры, как в PDO)
+     * @param string $charset='cp866' кодировка ответа (в командной строке по умолчанию cp866)
      * @return string
      * @throws WindowsException
      */  
@@ -75,7 +77,8 @@ class WindowsScriptHost
      * --RU--
      * Выполнить скрипт PowerShell (должен располагаться в одну строку)
      * @param string $query
-     * @param array $params Параметры для замены
+     * @param array $params=array() параметры для замены
+     * @param bool $wait=true ожидать окончания
      * @return string
      * @throws WindowsException
      */

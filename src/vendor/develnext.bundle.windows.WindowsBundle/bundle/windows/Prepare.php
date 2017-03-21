@@ -4,22 +4,26 @@ namespace bundle\windows;
 use php\util\Regex;
 use php\lib\str;
 
-
+/**
+ * Класс позволяет создавать подготовленные запросы (как в PDO).
+ * Далее подготовленные запросы будут использоваться в запросах к API Windows
+ */
 class Prepare
 {
-    const STRING = 'STRING',
-          INTEGER = 'INTEGER',
-          INT = 'INTEGER',
-          FLOAT = 'FLOAT',
-          BOOLEAN = 'BOOLEAN',
-          BOOL = 'BOOLEAN';
+    const STRING = 'STRING';
+    const STR = 'STRING';
+    const INTEGER = 'INTEGER';
+    const INT = 'INTEGER';
+    const FLOAT = 'FLOAT';
+    const BOOLEAN = 'BOOLEAN';
+    const BOOL = 'BOOLEAN';
           
-    private $source, 
-            $vars = [], // 'key' => 'value'
-            $safeQuery;
+    private $source; 
+    private $vars = []; // 'key' => 'value'
+    private $safeQuery;
             
-    public $addStringQuotes = false,
-           $replaceEmpty = false;
+    public $addStringQuotes = false;
+    public $replaceEmpty = false;
 
     public function __construct($query){
         $this->source = $query;

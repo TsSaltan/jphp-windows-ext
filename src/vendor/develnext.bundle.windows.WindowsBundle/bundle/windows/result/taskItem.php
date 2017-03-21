@@ -5,6 +5,9 @@ use bundle\windows\result\abstractItem;
 use bundle\windows\WindowsException;
 use bundle\windows\WindowsScriptHost as WSH;
 
+/**
+ * Экземпляр данного класса содержит информацию об одном процессе
+ */
 class taskItem extends abstractItem
 {
     /**
