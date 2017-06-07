@@ -8,17 +8,8 @@ include DIR . "autoloader.inc.php";
 use bundle\windows\Windows;
 use bundle\windows\Registry;
 
-use php\time\TimeZone;
-use php\time\Time;
 
-function abc($a){
-	var_dump('abc('.$a.')');
-	return __FUNCTION__;
-}
-
-abc(123)(456)(789)(101112);
-//var_dump(Registry::of('HKEY_CURRENT_USER\Printers\DeviceOld')->readFully());
-//var_dump(Windows::getCPU());
+var_dump(Windows::getCOM());
            
 die;
 var_dump(Windows::getTotalRAM());

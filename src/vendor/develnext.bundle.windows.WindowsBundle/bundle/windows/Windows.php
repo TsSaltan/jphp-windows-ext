@@ -351,6 +351,23 @@ class Windows
     public static function getMAC(){
         return UXApplication::getMacAddress();
     }
+
+    /**
+     * Получить список доступных COM портов
+     * @return array
+     */
+    public static function getCOM(){
+        $coms = WSH::CMD('chgport');
+        $coms = explode("\n", $coms);
+
+        $ports = [];
+        foreach ($coms as $com){
+        	$ex = explode('=', $com);
+        	$ports[trim($ex[0])] = trim($ex[1]);
+        }
+
+        return $ports;
+    }
     
     /**
      * Количество миллисекунд с момента запуска системы
