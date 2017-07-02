@@ -4,11 +4,12 @@ namespace bundle\windows;
 use bundle\windows\WindowsScriptHost as WSH;
 use bundle\windows\Registry;
 use bundle\windows\Task;
-use php\time\Time;
-use php\time\TimeFormat;
 use php\gui\UXApplication;
 use php\lib\str;
 use php\lang\System;
+use php\io\MiscStream;
+use php\time\Time;
+use php\time\TimeFormat;
 use php\util\Regex;
 use Exception;
 
@@ -18,7 +19,7 @@ class Windows
     /**
      * Текущая версия пакета
      */
-    const VERSION = '1.1.0.0';
+    const VERSION = '1.2.0.1';
 
     /**
      * --RU--
@@ -350,23 +351,6 @@ class Windows
      */
     public static function getMAC(){
         return UXApplication::getMacAddress();
-    }
-
-    /**
-     * Получить список доступных COM портов
-     * @return array
-     */
-    public static function getCOM(){
-        $coms = WSH::CMD('chgport');
-        $coms = explode("\n", $coms);
-
-        $ports = [];
-        foreach ($coms as $com){
-        	$ex = explode('=', $com);
-        	$ports[trim($ex[0])] = trim($ex[1]);
-        }
-
-        return $ports;
     }
     
     /**
