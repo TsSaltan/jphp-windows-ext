@@ -10,44 +10,28 @@ use bundle\windows\Registry;
 use bundle\windows\COM;
 
 
-$a = COM::searchDevice('CH340');
-var_dump($a);
-var_dump($a['COM4']->connect()->read(100));
-die;
-
+        
 use php\io\MiscStream;
+use php\io\FileStream;
 
 $port = 'COM4';
-$stream = MiscStream::of($port, 'a');
-var_dump($stream);
-$stream->write('+');
+$stream = FileStream::of($port, 'w');
+$stream->write("+\r\n");
+$stream->close();
 var_dump('aaa');
-///$stream->seek(0);
+//$stream->flush();
 var_dump('bbb');
 
+$stream = FileStream::of($port, 'r');
+
+var_dump('ccc');
+echo $stream->read(2);
+var_dump('ddd');
 while($stream->eof()){
-	$item = $stream->read(1);
-	if($item == '{'){
-		$json = $item;
-	} elseif($item == '}') {
-		onJson($json . '}');
-	} else {
-		$json.=$item;
-	}
-
-	var_dump(['n' => $json]);
+	echo $stream->read(2);
 }
-
-function onJson($json){
-	$data = json_decode($json);
-	if(!$data || $data === null) return;
-
-	var_dump(['onJson' => $data]);
-}
-
-// var_dump(Windows::getCOM());
            
-die;
+die('-end');
 var_dump(Windows::getTotalRAM());
 var_dump(['is_admin' => Windows::isAdmin()]);	
 var_dump(['temp' => Windows::expandEnv('%programdata%\\Windows\\')]);

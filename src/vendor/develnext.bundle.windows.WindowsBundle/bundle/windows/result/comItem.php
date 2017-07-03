@@ -49,11 +49,21 @@ class comItem extends abstractItem
     /**
      * --RU--
      * Подключиться к порту
+     * @param string $mode='r'
      * @return php\io\MiscStream
      * @throws IOException
      */
-    public function connect(){
+    public function connect($mode = 'r'){
         return MiscStream::of($this->port);
+    }
+
+    /**
+     * --RU--
+     * Установить скорость порта (бод)
+     * @param int $baud
+     */
+    public function setBaud(int $baud){
+        return WSH::cmd('mode ' . $this->port . ' baud=' . $baud);
     }
 
     public function __toString(){

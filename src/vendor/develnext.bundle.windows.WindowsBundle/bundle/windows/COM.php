@@ -59,7 +59,7 @@ class COM
         $ports = [];
         foreach ($r as $v) {
             $string = ''; // Делаем конкатенацию полей, где может фигурировать номер COM порта
-            foreach ($searchCOM as $field) {
+            foreach ($searchCOM as $field){
                 $string .= $v[$field];
             }
             $regex = Regex::of('(COM[0-9]+)', Regex::CASE_INSENSITIVE + Regex::UNICODE_CASE)->with($string);
