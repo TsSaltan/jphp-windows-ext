@@ -2,6 +2,7 @@
 namespace bundle\windows\result;
 
 use php\io\MiscStream;
+use bundle\windows\WindowsScriptHost as WSH;
 
 class comItem extends abstractItem
 {
@@ -61,6 +62,7 @@ class comItem extends abstractItem
      * --RU--
      * Установить скорость порта (бод)
      * @param int $baud
+     * @throws WindowsException
      */
     public function setBaud($baud){
         return WSH::cmd('mode ' . $this->port . ' baud=' . $baud);
