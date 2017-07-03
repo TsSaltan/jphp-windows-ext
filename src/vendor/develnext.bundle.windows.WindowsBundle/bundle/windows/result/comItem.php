@@ -62,7 +62,7 @@ class comItem extends abstractItem
      * Установить скорость порта (бод)
      * @param int $baud
      */
-    public function setBaud(int $baud){
+    public function setBaud($baud){
         return WSH::cmd('mode ' . $this->port . ' baud=' . $baud);
     }
 
