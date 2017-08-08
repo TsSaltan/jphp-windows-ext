@@ -19,7 +19,7 @@ class Windows
     /**
      * Текущая версия пакета
      */
-    const VERSION = '1.2.0.3';
+    const VERSION = '1.2.0.4';
 
     /**
      * --RU--
@@ -386,30 +386,7 @@ class Windows
             }
         } catch (WindowsException $e){  }
 
-        // 2. Данные с датчиков материрнской карты
-        try{
-            $temps = WSH::WMIC('/namespace:\\\\root\\cimv2 PATH Win32_PerfFormattedData_Counters_ThermalZoneInformation get Name,Temperature');
-
-            foreach($temps as $temp){
-                if(strpos($temp['Name'], 'TZ.') > 0){
-                    $name = explode('.', $temp['Name'])[1];
-                    $location = 'Chipset';
-                }
-                else {
-                    $name = $temp['Name'];
-                    $location = 'None';
-                }
-
-                $return[] = [
-                    'name' => $name,
-                    'temp' => $temp['Temperature'] - 273, // Температура в Кельвинах
-                    'location' => $location
-                ];    
-            }
-    
-        } catch (WindowsException $e){  }
-
-        // 3. Данные с различных датчиков
+        // 2. Данные с различных датчиков
         try{
             $msacpi = WSH::WMIC('/namespace:\\\\root\\WMI path MSAcpi_ThermalZoneTemperature get InstanceName,CurrentTemperature');
             foreach($msacpi as $v){
@@ -423,6 +400,7 @@ class Windows
                 if(strpos($v['InstanceName'], 'CPUZ') !== false) $location = 'CPU';
                 elseif(strpos($v['InstanceName'], 'GFXZ') !== false) $location = 'GFX';
                 elseif(strpos($v['InstanceName'], 'BATZ') !== false) $location = 'Battery';
+                elseif(strpos($name, 'TZ') === 0) $location = 'Chipset';
                 else $location = 'None';
                 
 
@@ -433,7 +411,30 @@ class Windows
                 ];
             }
     
-        } catch (WindowsException $e){  }
+        } catch (WindowsException $e){  
+            // 3. Данные с датчиков материрнской карты
+            try{
+                $temps = WSH::WMIC('/namespace:\\\\root\\cimv2 PATH Win32_PerfFormattedData_Counters_ThermalZoneInformation get Name,Temperature');
+
+                foreach($temps as $temp){
+                    if(strpos($temp['Name'], 'TZ.') > 0){
+                        $name = explode('.', $temp['Name'])[1];
+                        $location = 'Chipset';
+                    }
+                    else {
+                        $name = $temp['Name'];
+                        $location = 'None';
+                    }
+
+                    $return[] = [
+                        'name' => $name,
+                        'temp' => $temp['Temperature'] - 273, // Температура в Кельвинах
+                        'location' => $location
+                    ];    
+                }
+        
+            } catch (WindowsException $e){  }
+        }
 
         return $return;
     }

@@ -13,7 +13,7 @@ use bundle\windows\COM;
 use bundle\windows\WindowsException;
 
 
-var_dump(Windows::getTemperature());
+var_dump(Windows::getCPU());
 die;
 
 var_dump(Windows::getTotalRAM());

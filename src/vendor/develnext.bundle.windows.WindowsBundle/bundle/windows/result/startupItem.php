@@ -54,8 +54,10 @@ class startupItem extends abstractItem
     public function __construct($title, $command, $location){
         $this->title = $title;
         $this->location = $location;
-        $this->command = str::contains($command, '"') ? str::sub($command, 1, str::pos($command, '"', 1)) : $command;
-        $this->file = realpath($this->command);
+        $this->command = $command;
+        
+        $file = str::contains($command, '"') ? str::sub($command, 1, str::pos($command, '"', 1)) : $command;
+        $this->file = realpath(Windows::expandEnv($file));
 
         if($location == 'Startup'){
             $this->shortcut = Startup::getUserStartupDirectory() . '\\' . $this->command;

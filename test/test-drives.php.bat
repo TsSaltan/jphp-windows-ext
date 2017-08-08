@@ -8,7 +8,7 @@ include DIR . "autoloader.inc.php";
 use bundle\windows\Windows;
 
 
-$drives = Windows::getDrives();	
+var_dump($drives = Windows::getDrives());	die;
 foreach($drives as $drive){
 	var_dump([$drive['Name'] => [
 		'title' => $drive['VolumeName'],
