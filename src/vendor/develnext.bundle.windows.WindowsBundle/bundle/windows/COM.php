@@ -13,7 +13,7 @@ class COM
     /**
      * --RU--
      * Получить список портов
-     * @return array(\result\comItem)
+     * @return comItem[]
      */
     public static function getList(){
         $com = [];
@@ -43,7 +43,7 @@ class COM
      * Ищет устройство по имени
      * @param string $search Строка поиска
      * @param array $searchFields=['Caption','Description','Name','Service'] Поля, по ктоторым осуществляется поиск
-     * @return array(\result\comItem)
+     * @return comItem[]
      */
     public static function searchDevice($search, $searchFields = ['Caption', 'Description', 'Name', 'Service']){
         $searchCOM = ['Caption', 'Name']; // Поля, в которых фигурирует номер COM порта

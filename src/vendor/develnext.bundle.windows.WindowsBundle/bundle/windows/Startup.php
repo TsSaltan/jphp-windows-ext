@@ -15,7 +15,7 @@ class Startup
     /**
      * --RU--
      * Получить список программ, находящихся в автозагрузке
-     * @return array массив экземпляров класса \result\startupItem
+     * @return startupItem[]
      */
     public static function getList(){
         $items = WSH::WMIC('startup get');
@@ -33,7 +33,7 @@ class Startup
      * Добавляет программу в автозагрузку
      * @param string $file Команда для запуска
      * @param string $description=null Описание
-     * @return \result\startupItem
+     * @return startupItem
      */
     public static function add($file, $description = null){
         $dir = self::getUserStartupDirectory();
@@ -47,7 +47,7 @@ class Startup
      * --RU--
      * Найти запись в автозапуске по исполняемому файлу
      * @param string $file Путь к исполняемому файлу
-     * @return \result\startupItem|false в случае ошибки возвращает false
+     * @return startupItem
      */
     public static function find($file){
         $list = self::getList();

@@ -30,7 +30,7 @@ class Registry
     
     /**
      * Alias __construct
-     * @return \Registry
+     * @return Registry
      */
     public static function of($path){
         return new self($path);
@@ -38,7 +38,7 @@ class Registry
     
     /**
      * HKEY_CLASSES_ROOT
-     * @return \Registry
+     * @return Registry
      */
     public static function HKCR(){
         return new self('HKEY_CLASSES_ROOT');
@@ -46,7 +46,7 @@ class Registry
 
     /**
      * HKEY_CURRENT_USER
-     * @return \Registry
+     * @return Registry
      */
     public static function HKCU(){
         return new self('HKEY_CURRENT_USER');
@@ -54,7 +54,7 @@ class Registry
 
     /**
      * HKEY_LOCAL_MACHINE
-     * @return \Registry
+     * @return Registry
      */
     public static function HKLM(){
         return new self('HKEY_LOCAL_MACHINE');
@@ -62,7 +62,7 @@ class Registry
 
     /**
      * HKEY_USERS
-     * @return \Registry
+     * @return Registry
      */
     public static function HKU(){
         return new self('HKEY_USERS');
@@ -70,7 +70,7 @@ class Registry
 
     /**
      * HKEY_CURRENT_CONFIG
-     * @return \Registry
+     * @return Registry
      */
     public static function HKCC(){
         return new self('HKEY_CURRENT_CONFIG');
@@ -80,7 +80,7 @@ class Registry
      * --RU--
      * Полное чтение содержимого раздела (ключ, значения, подразделы)
      * @param bool $recursive=false рекурсивное чтение из подразделов
-     * @return array массив экземпляров класса \result\registryResult
+     * @return registryResult[]
      */
     
     public function readFully($recursive = false){
@@ -92,7 +92,7 @@ class Registry
      * --RU--
      * Чтение ключа
      * @param string $key имя ключа
-     * @return \registryItem
+     * @return registryItem
      */
     public function read($key){
         $exec = WSH::cmd('reg query ":path" /v ":key"', ['path' => $this->path, 'key' => $key]);
@@ -156,7 +156,7 @@ class Registry
      * @param string $search
      * @param bool $recursive=false Искать в подразделах
      * @param bool $fullEqual=false Только полное совпадение
-     * @return array массив экземпляров класса \result\registryResult
+     * @return registryResult[]
      */
     public function search($search, $recursive = false, $fullEqual = false){
         $exec = WSH::cmd('reg query ":path" /f ":search"' . ($fullEqual ? ' /e' : '') . ($recursive ? ' /s' : ''), ['path' => $this->path, 'search' => $search]);
@@ -169,7 +169,7 @@ class Registry
      * @param string $search
      * @param bool $recursive=false Искать в подразделах
      * @param bool $fullEqual=false Только полное совпадение
-     * @return array массив экземпляров класса \result\registryResult
+     * @return registryResult[]
      */
     public function searchValue($search, $recursive = false, $fullEqual = false){
         $exec = WSH::cmd('reg query ":path" /f ":search" /d' . ($fullEqual ? ' /e' : '') . ($recursive ? ' /s' : ''), ['path' => $this->path, 'search' => $search]);

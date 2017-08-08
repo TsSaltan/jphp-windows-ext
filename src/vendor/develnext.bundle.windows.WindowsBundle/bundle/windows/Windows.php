@@ -19,14 +19,14 @@ class Windows
     /**
      * Текущая версия пакета
      */
-    const VERSION = '1.2.0.2';
+    const VERSION = '1.2.0.3';
 
     /**
      * --RU--
      * Раскрывает системные переменные (%TEMP%, %APPDATA% и т.д.)
      * @param string $string
      * @return string
-     * @example Windows: :expandEnv('%programdata%\\Windows\\'); // string(23) "C:\ProgramData\Windows\"
+     * @example Windows::expandEnv('%programdata%\\Windows\\'); // string(23) "C:\ProgramData\Windows\"
      */
     public static function expandEnv($string){
         $reg = '%([^%]+)%';
@@ -351,6 +351,91 @@ class Windows
      */
     public static function getMAC(){
         return UXApplication::getMacAddress();
+    }    
+
+    /**
+     * Получить температуру с датчиков (желательно запускать с парвами администратора)
+     * @return array ([name, temp, location])
+     */
+    public static function getTemperature(){
+        $return = [];
+
+        // 1. Пробуем прочитать данные с HDD
+        try{
+            $hdds = WSH::WMIC('/namespace:\\\\root\\WMI path MSStorageDriver_ATAPISmartData get');
+
+            // Ищем элемент со значением 194, через 5 ключей будет элемент со значением температуры
+            foreach($hdds as $hdd){
+                $vs = explode(',', $hdd['VendorSpecific']);
+                $tempIndex = 0;
+            
+                foreach ($vs as $k => $v) {
+                    if(intval($v) == 194){
+                        $tempIndex = $k + 5;
+                        break;
+                    }
+                }
+
+                // Температура в цельсиях, преобразование не нужно
+                $temp = $vs[$tempIndex];
+                $return[] = [
+                    'name' => $hdd['InstanceName'],
+                    'temp' => $temp,
+                    'location' => 'HDD'
+                ];
+            }
+        } catch (WindowsException $e){  }
+
+        // 2. Данные с датчиков материрнской карты
+        try{
+            $temps = WSH::WMIC('/namespace:\\\\root\\cimv2 PATH Win32_PerfFormattedData_Counters_ThermalZoneInformation get Name,Temperature');
+
+            foreach($temps as $temp){
+                if(strpos($temp['Name'], 'TZ.') > 0){
+                    $name = explode('.', $temp['Name'])[1];
+                    $location = 'Chipset';
+                }
+                else {
+                    $name = $temp['Name'];
+                    $location = 'None';
+                }
+
+                $return[] = [
+                    'name' => $name,
+                    'temp' => $temp['Temperature'] - 273, // Температура в Кельвинах
+                    'location' => $location
+                ];    
+            }
+    
+        } catch (WindowsException $e){  }
+
+        // 3. Данные с различных датчиков
+        try{
+            $msacpi = WSH::WMIC('/namespace:\\\\root\\WMI path MSAcpi_ThermalZoneTemperature get InstanceName,CurrentTemperature');
+            foreach($msacpi as $v){
+                if(strpos($v['InstanceName'], '\\') > 0){
+                    $exp = explode('\\', $v['InstanceName']);
+                    $name = end($exp);
+                } else {
+                    $name = $v['InstanceName'];
+                }
+
+                if(strpos($v['InstanceName'], 'CPUZ') !== false) $location = 'CPU';
+                elseif(strpos($v['InstanceName'], 'GFXZ') !== false) $location = 'GFX';
+                elseif(strpos($v['InstanceName'], 'BATZ') !== false) $location = 'Battery';
+                else $location = 'None';
+                
+
+                $return[] = [
+                    'temp' => $v['CurrentTemperature'] / 10 - 273, // Температура в Кельвинах * 10
+                    'name' => $name,
+                    'location' => $location,
+                ];
+            }
+    
+        } catch (WindowsException $e){  }
+
+        return $return;
     }
     
     /**

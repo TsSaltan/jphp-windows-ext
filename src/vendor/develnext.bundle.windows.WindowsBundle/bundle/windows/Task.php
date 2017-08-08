@@ -24,7 +24,7 @@ class Task
      * --RU--
      * Поиск процесса по PID
      * @param int $pid
-     * @return \result\taskItem|false
+     * @return \result\taskItem
      */
     public static function findByPID($pid){
         $proc = self::exec('PID eq '.$pid);
@@ -35,7 +35,7 @@ class Task
      * --RU--
      * Поиск процесса по имени образа
      * @param string $name
-     * @return \result\taskResult|false
+     * @return \result\taskResult
      */
     public static function find($name){
         $proc = self::exec('IMAGENAME eq '.$name);
@@ -46,7 +46,7 @@ class Task
      * --RU--
      * Поиск процесса по заголовку окна
      * @param string $title
-     * @return \result\taskResult|false
+     * @return \result\taskResult
      */
     public static function findByTitle($title){
         $proc = self::exec('WINDOWTITLE eq '.$title);
