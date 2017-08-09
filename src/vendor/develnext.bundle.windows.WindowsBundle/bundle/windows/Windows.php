@@ -19,7 +19,7 @@ class Windows
     /**
      * Текущая версия пакета
      */
-    const VERSION = '1.2.0.4';
+    const VERSION = '1.2';
 
     /**
      * --RU--
@@ -405,7 +405,7 @@ class Windows
                 
 
                 $return[] = [
-                    'temp' => round($v['CurrentTemperature'] / 10 - 273), // Температура в Кельвинах * 10
+                    'temp' => $v['CurrentTemperature'] / 10 - 273, // Температура в Кельвинах * 10
                     'name' => $name,
                     'location' => $location,
                 ];
