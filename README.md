@@ -6,6 +6,11 @@
 
 ## Changelog
 ```
+--- 1.2 ---
+[Add] Class COM
+[Add] Windows::getTemperature()
+[Fix] Bug fixes
+
 --- 1.1 ---
 [Change] Создана подробная документация
 [Change] Disable WMIC cache
