@@ -380,7 +380,7 @@ class Windows
                 $temp = $vs[$tempIndex];
                 $return[] = [
                     'name' => $hdd['InstanceName'],
-                    'temp' => $temp,
+                    'temp' => intval($temp),
                     'location' => 'HDD'
                 ];
             }
@@ -405,7 +405,7 @@ class Windows
                 
 
                 $return[] = [
-                    'temp' => $v['CurrentTemperature'] / 10 - 273, // Температура в Кельвинах * 10
+                    'temp' => round($v['CurrentTemperature'] / 10 - 273), // Температура в Кельвинах * 10
                     'name' => $name,
                     'location' => $location,
                 ];
@@ -428,7 +428,7 @@ class Windows
 
                     $return[] = [
                         'name' => $name,
-                        'temp' => $temp['Temperature'] - 273, // Температура в Кельвинах
+                        'temp' => intval($temp['Temperature']) - 273, // Температура в Кельвинах
                         'location' => $location
                     ];    
                 }
