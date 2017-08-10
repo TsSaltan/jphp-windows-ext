@@ -8,6 +8,7 @@ use bundle\windows\WindowsException;
 use bundle\windows\Registry;
 use php\lib\str;
 use php\lib\fs;
+use php\util\Regex;
 
 class startupItem extends abstractItem
 {
@@ -56,7 +57,7 @@ class startupItem extends abstractItem
         $this->location = $location;
         $this->command = $command;
         
-        $file = str::contains($command, '"') ? str::sub($command, 1, str::pos($command, '"', 1)) : $command;
+        $file = $this->getFileFromCommand($command);
         $this->file = realpath(Windows::expandEnv($file));
 
         if($location == 'Startup'){
@@ -68,6 +69,19 @@ class startupItem extends abstractItem
             $this->shortcut = $location;
             $this->location = 'Registry';
         }
+    }
+
+    private function getFileFromCommand($command){
+        $file = null;
+        if(str::contains($command, '"') and str::sub($command, 0, 1) == '"'){
+            $file = str::sub($command, 1, str::pos($command, '"', 1));
+        } elseif($reg = Regex::of("\\\\([^\\s\\\\]+\\.[^\\s\\\\]+)(\\s[\\S]+)+", Regex::CASE_INSENSITIVE)->with($command) and $reg->find()){
+            $file = $reg->group(1);
+        } else {
+            $file = $command;
+        }
+
+        return $file;
     }
 
     /** 

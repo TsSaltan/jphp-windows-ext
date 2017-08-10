@@ -6,7 +6,9 @@ include DIR . "autoloader.inc.php";
 ###
 
 use bundle\windows\Startup;
+use bundle\windows\Registry;
+use bundle\windows\WindowsException;
 
 
 $startup = Startup::getList();
-var_dump($startup);
+return var_dump($startup);

@@ -19,7 +19,7 @@ class Windows
     /**
      * Текущая версия пакета
      */
-    const VERSION = '1.2';
+    const VERSION = '1.2.1.0-dev';
 
     /**
      * --RU--
