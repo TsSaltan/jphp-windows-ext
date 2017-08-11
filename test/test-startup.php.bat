@@ -10,5 +10,5 @@ use bundle\windows\Registry;
 use bundle\windows\WindowsException;
 
 
-$startup = Startup::getList();
+$startup = Startup::loadDisabled();
 return var_dump($startup);

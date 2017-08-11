@@ -31,31 +31,23 @@ class Startup
         return array_values($return);
     }
 
+    /**
+     * Загрузка элементов из WMI
+     */
     private static function loadWMIC(){
         $list = WSH::WMIC('startup get');
         $startup = [];
-        $rShort = [
-            'HKCR\\',
-            'HKCU\\',
-            'HKLM\\',
-            'HKU\\',
-            'HKCC\\',
-        ];
-        $rFull = [
-            'HKEY_CLASSES_ROOT\\',
-            'HKEY_CURRENT_USER\\',
-            'HKEY_LOCAL_MACHINE\\',
-            'HKEY_USERS\\',
-            'HKEY_CURRENT_CONFIG\\',
-        ];
 
         foreach($list as $v){
-            $startup[] = ['title' => $v['Caption'], 'command' => $v['Command'], 'location' => str_replace($rShort, $rFull, $v['Location'])];
+            $startup[] = ['title' => $v['Caption'], 'command' => $v['Command'], 'location' => $this->expandRegPath($v['Location'])];
         }
 
         return $startup;
     }
 
+    /**
+     * Загрузка элементов из реестра
+     */
     private static function loadRegistry(){
         $regPaths = [
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run',
@@ -63,22 +55,17 @@ class Startup
             'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run',
             'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce',
             'HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Run',
+
+            // If added by Group Policy
+            'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run',
+            'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run',
+
+            //x64
+            'HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Run',
+            'HKEY_LOCAL_MACHINE\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\RunOnce',
         ];
 
         $startup = [];
-
-        /*  ["title"]=>
-        string(8) "OneDrive"
-        ["command"]=>
-        string(78) ""C:\Users\Ts.Saltan\AppData\Local\Microsoft\OneDrive\OneDrive.exe" /background"
-        ["file"]=>
-        string(64) "C:\Users\Ts.Saltan\AppData\Local\Microsoft\OneDrive\OneDrive.exe"
-        ["shortcut"]=>
-        string(94) "HKU\S-1-5-21-4010451308-21402009-2175576964-1002\SOFTWARE\Microsoft\Windows\CurrentVersion\Run"
-        ["location"]=>
-        string(8) "Registry"*/
-        //__construct($title, $command, $location)
-
 
         foreach($regPaths as $path){
             try{
@@ -94,6 +81,51 @@ class Startup
         }
 
         return $startup;
+    }
+
+    /**
+     * Загрузка элементов из реестра
+     */
+    public static function loadDisabled(){
+        $regPaths = [
+            'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run',
+            'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32',
+            'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder',
+            'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run',
+            'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32',
+            'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\StartupFolder',
+        ];
+
+
+        $startup = [];
+       
+        foreach($regPaths as $path){
+            try{
+                $reg = Registry::of($path)->readFully();
+                foreach($reg as $r){
+                    foreach($r as $v){
+                        $startup[$r->path][] = [$v->key => $v->value, 'bin' => hex2bin($v->value)];
+                        //file_put_contents('F:\test_' . $v->key . '.bin', hex2bin($v->value));
+                    }
+                }
+
+            } catch(WindowsException $e){
+            }
+        }
+
+        return $startup;
+    }
+
+    private static function expandRegPath($path){
+        $reg = [
+            'HKCR\\' => 'HKEY_CLASSES_ROOT\\',
+            'HKCU\\' => 'HKEY_CURRENT_USER\\',
+            'HKLM\\' => 'HKEY_LOCAL_MACHINE\\',
+            'HKU\\' => 'HKEY_USERS\\',
+            'HKCC\\' => 'HKEY_CURRENT_CONFIG\\',
+        ];
+
+        return str_replace(array_keys($reg), array_values($reg), $path);
     }
 
 

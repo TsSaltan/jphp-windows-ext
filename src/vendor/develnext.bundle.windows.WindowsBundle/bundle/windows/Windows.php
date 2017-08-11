@@ -649,6 +649,10 @@ class Windows
         return self::psAudioQuery('Mute') == 'True';     
     }
 
+    public static function asAdmin($command, $dir=NULL){
+        WSH::VBScript('CreateObject("Shell.Application").ShellExecute("cmd.exe", "/c '.$command.'", "'.$dir.'", "runas", 1)(window.close)');
+    }
+
     private static $psAudioClass = <<<PS
         using System.Runtime.InteropServices;
      

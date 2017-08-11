@@ -12,8 +12,16 @@ use bundle\windows\Registry;
 use bundle\windows\COM;
 use bundle\windows\WindowsException;
 
+//return Windows::asAdmin('cmd.exe');
 
-var_dump(Windows::getTemperature());
+if(!Windows::isAdmin()){
+	global $argv;
+	Windows::asAdmin(implode(' ', $argv));
+	echo "Restarting as admin...";
+	die;
+}
+
+var_dump(['isAdmin' => Windows::isAdmin()]);
 die;
 
 var_dump(Windows::getTotalRAM());
