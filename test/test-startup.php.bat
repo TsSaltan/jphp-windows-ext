@@ -7,8 +7,16 @@ include DIR . "autoloader.inc.php";
 
 use bundle\windows\Startup;
 use bundle\windows\Registry;
+use bundle\windows\Windows;
 use bundle\windows\WindowsException;
 
+if(!Windows::isAdmin()){
+	global $argv;
+	Windows::runAsAdmin('cmd.exe', '/c ' . implode(' ', $argv));
+	echo "Restarting as admin...";
+	die;
+}
 
-$startup = Startup::loadDisabled();
+$startup = Startup::getList();
 return var_dump($startup);
+

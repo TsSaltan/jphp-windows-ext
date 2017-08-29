@@ -4,14 +4,15 @@ namespace bundle\windows;
 use bundle\windows\WindowsScriptHost as WSH;
 use bundle\windows\Registry;
 use bundle\windows\Task;
+use Exception;
 use php\gui\UXApplication;
-use php\lib\str;
-use php\lang\System;
 use php\io\MiscStream;
+use php\lang\System;
+use php\lib\fs;
+use php\lib\str;
 use php\time\Time;
 use php\time\TimeFormat;
 use php\util\Regex;
-use Exception;
 
 
 class Windows
@@ -19,7 +20,7 @@ class Windows
     /**
      * Текущая версия пакета
      */
-    const VERSION = '1.2.1.0-dev';
+    const VERSION = '1.2.1.3-dev';
 
     /**
      * --RU--
@@ -51,8 +52,7 @@ class Windows
      * Проверить, относится ли текущая система к семейству OS Windows
      * @return bool
      */
-    public static function isWin()
-    {
+    public static function isWin(){
         return Str::posIgnoreCase(System::getProperty('os.name'), 'WIN') > -1;
     }
     
@@ -61,8 +61,7 @@ class Windows
      * Проверить, запущена ли программа от имени администратора
      * @return bool
      */
-    public static function isAdmin()
-    {
+    public static function isAdmin(){
         try {
             (new Registry('HKU\\S-1-5-19'))->readFully();
             return true;
@@ -70,13 +69,61 @@ class Windows
             return false;
         }
     }
+
+    /**
+     * Запустить процесс от имени администратора
+     * @param string $file
+     * @param mixed $args Строка с аргументами через пробел или массив аргументов
+     * @param string $dir
+     */
+    public static function runAsAdmin($file, $args = [], $dir = NULL){
+        $args = is_array($args) ? implode(' ', $args) : $args;
+        return WSH::VBScript('CreateObject("Shell.Application").ShellExecute(":file", ":args", ":dir", "runas", 1)', [
+                'file' => $file,
+                'args' => $args,
+                'dir' => $dir
+        ]);
+    }
+
+    /**
+     * Перезапускает текущую программу с требованием прав администратора
+     */
+    public static function requireAdmin(){
+        global $argv;
+        if(self::isAdmin()) return;
+
+        if(str::endsWith($argv[0], '/lib/jphp-core.jar')) throw new WindowsException('Cannot restart this build with administrator privileges');
+
+        if(str::startsWith($argv[0], '/') and str::contains($argv[0], ':')){
+            $argv[0] = str::sub($argv[0], 1);
+        }
+
+        switch(fs::ext($argv[0])){
+            case 'exe':
+                $cmd = $argv[0];
+                $params = array_slice($argv, 1);
+            break;
+
+            case 'jar':
+                $cmd = 'javaw.exe';
+                $params = array_merge(['-jar'], $argv);
+            break;
+
+            default:
+                $cmd = 'cmd.exe';
+                $params = array_merge(['/c'], $argv);
+
+        }
+       
+        self::runAsAdmin($cmd, $params);
+        exit;
+    }
     
     /**
      * Получить разрядность системы
      * @return string 'x64' или 'x86'
      */
-    public static function getArch()
-    {
+    public static function getArch(){
         return isset(System::getEnv()['ProgramFiles(x86)']) ? 'x64' : 'x86'; // В 64-битных системах будет прописан путь к Program Filex (x86)
     }
 
@@ -86,12 +133,20 @@ class Windows
      * Получить путь ко временной папке
      * @return string
      */
-    public static function getTemp()
-    {
+    public static function getTemp(){
         return self::expandEnv('%TEMP%');
     }
       
     
+    /**
+     * --RU--
+     * Получить список пользователей на данном ПК
+     * @return array
+     */
+    public static function getUsers(){
+        return WSH::WMIC('UserAccount get');
+    }
+
     /**
      * Return serial number of a drive.
      * --RU--
@@ -573,7 +628,7 @@ class Windows
      * @param string $text Текст
      */
     public static function speak($text){
-        return WSH::vbScript('CreateObject("SAPI.SpVoice").Speak("'.$text.'")(window.close)');
+        return WSH::vbScript('CreateObject("SAPI.SpVoice").Speak(":text")', ['text' => $text]);
     }
 
     /**
@@ -649,10 +704,6 @@ class Windows
         return self::psAudioQuery('Mute') == 'True';     
     }
 
-    public static function asAdmin($command, $dir=NULL){
-        WSH::VBScript('CreateObject("Shell.Application").ShellExecute("cmd.exe", "/c '.$command.'", "'.$dir.'", "runas", 1)(window.close)');
-    }
-
     private static $psAudioClass = <<<PS
         using System.Runtime.InteropServices;
      
@@ -698,20 +749,41 @@ class Windows
         }
 PS;
 
-    private static function psAudioQuery($key, $value = null){
-        //try{            
-            $params['class'] = base64_encode(str_replace(["\t", "  "], '', self::$psAudioClass));
-            $params['key'] = $key;
-            $params['value'] = $value;
+    private static function psAudioQuery($key, $value = null){          
+        $params['class'] = base64_encode(str_replace(["\t", "  "], '', self::$psAudioClass));
+        $params['key'] = $key;
+        $params['value'] = $value;
 
-            return WSH::PowerShell(
-                '[string]$code = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\':class\')); '.
-                'Add-Type -Language CSharpVersion3 -TypeDefinition $code; [ audio ]:::key'. (!is_null($value) ? ' = :value' : ''),
-                $params
-            );
-       /* } catch (\Exception $e){
-            //throw new WindowsException('Audio driver does not support changing the volume param');
-        }*/
+        return WSH::PowerShell(
+            '[string]$code = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\':class\')); '.
+            'Add-Type -Language CSharpVersion3 -TypeDefinition $code; [ audio ]:::key'. (!is_null($value) ? ' = :value' : ''),
+            $params
+        );
+    }
+
+    /**
+     * Установить системное время (нужны права администратора)
+     * @param mixed $time Строка вида hh:mm:ss (напирмер, "10:20:00") или массив [10, 20, 0]
+     * @throws WindowsException
+     */
+    public static function setTime($time){
+        $time = is_array($time) ? implode(':', $time) : $time;
+        if(!Regex::match('^([0-9]|[0-1][0-9]|[2][0-3]):([0-9]|[0-5][0-9]):([0-9]|[0-5][0-9])$', $time)){
+            throw new WindowsException('Invalid time value "' . $time . '". Supported format: hh:mm:ss');
+        }
+        return WSH::CMD('echo :time | time', ['time' => $time]);
+    }
+
+    /**
+     * Установить системную дату (нужны права администратора)
+     * @param mixed $date Строка вида dd.MM.YYYY (напирмер, "31.12.2017") или массив [31, 12, 2017]
+     */
+    public static function setDate($date){
+        $date = is_array($date) ? implode('.', $date) : $date;
+        if(!Regex::match('^([1-9]|[0-2][0-9]|3[0-1])\.([1-9]|0[0-9]|1[0-2])\.([1-2][0-9]{3})$', $date)){
+            throw new WindowsException('Invalid date value "' . $date . '". Supported format: dd.MM.YYYY');
+        }
+        return WSH::CMD('echo :date | date', ['date' => $date]);
     }
 
 

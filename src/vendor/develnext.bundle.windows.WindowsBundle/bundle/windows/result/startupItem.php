@@ -46,6 +46,14 @@ class startupItem extends abstractItem
 
     /**
      * --RU--
+     * Для всех пользователей
+     * @readonly
+     * @var bool
+     */
+    public $forAllUsers;
+
+    /**
+     * --RU--
      * Расположение записи (Реестр, папка startup и т.д.)
      * @readonly
      * @var string
@@ -69,7 +77,19 @@ class startupItem extends abstractItem
             $this->shortcut = $location;
             $this->location = 'Registry';
         }
+
+        $this->forAllUsers = $this->isForAllUsers();
     }
+
+    /**
+     * Автозагрузка для всех пользователей
+     * @return bool
+     */
+    public function isForAllUsers(){
+        return $this->location == 'Common Startup' ||
+               ($this->location == 'Registry' && str::startsWith($this->shortcut, 'HKEY_LOCAL_MACHINE'));
+
+    }    
 
     private function getFileFromCommand($command){
         $file = null;
@@ -131,7 +151,7 @@ class startupItem extends abstractItem
     
     /**
      * --RU--
-     * Расположение ярлыка для запуска
+     * Путь к ярлыку для запуска
      * @return string
      */
     public function getShortcut(){

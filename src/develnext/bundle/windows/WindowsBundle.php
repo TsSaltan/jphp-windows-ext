@@ -11,8 +11,5 @@ use ide\project\Project;
  */
 class WindowsBundle extends AbstractJarBundle
 {
-    public function isAvailable(Project $project)
-    {
-        return $project->hasBehaviour(GuiFrameworkProjectBehaviour::class);
-    }
+
 }

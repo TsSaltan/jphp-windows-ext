@@ -12,15 +12,15 @@ use bundle\windows\Registry;
 use bundle\windows\COM;
 use bundle\windows\WindowsException;
 
+//Windows::Speak('test 123');
 //return Windows::asAdmin('cmd.exe');
-
-if(!Windows::isAdmin()){
-	global $argv;
-	Windows::asAdmin(implode(' ', $argv));
-	echo "Restarting as admin...";
-	die;
-}
-
+//Windows::requireAdmin();
+Windows::setTime([10, 1, 105]);
+Windows::setDate('16.08.1995');
+/**
+global $argv;
+var_dump(['argv' => $argv]);
+Windows::requireAdmin();
 var_dump(['isAdmin' => Windows::isAdmin()]);
 die;
 
@@ -30,3 +30,4 @@ var_dump(['temp' => Windows::expandEnv('%programdata%\\Windows\\')]);
 var_dump(['appData' => Windows::expandEnv('%appdata%')]);
 var_dump(['arch' => Windows::getArch()]);
 var_dump(['uuid' => Windows::getUUID()]);
+//*/

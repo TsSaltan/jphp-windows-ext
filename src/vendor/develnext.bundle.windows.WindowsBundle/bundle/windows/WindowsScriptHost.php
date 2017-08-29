@@ -16,8 +16,6 @@ use php\util\Regex;
 class WindowsScriptHost
 {
     protected static function Exec($cmd, $wait = false, $charset = 'cp1251'){
-        //Logger::Info('[WSH::Exec] ' . implode(' ', $cmd));
-
         $cmd = (!is_array($cmd)) ? [$cmd] : $cmd;
         
         $process = new Process($cmd);
@@ -50,7 +48,7 @@ class WindowsScriptHost
     
     /**
      * --RU--
-     * Сделать запрос к WMIC
+     * Сделать запрос к WMI
      * @param string $query
      * @return array
      * @throws WindowsException
@@ -91,10 +89,12 @@ class WindowsScriptHost
      * --RU--
      * Выполнить скрипт vbScript (должен располагаться в одну строку)
      * @param string $query
+     * @param string $params
      * @return string
      * @throws WindowsException
      */
-    public static function vbScript($query){
-        return self::cmd('mshta vbscript:Execute(":query")', ['query' => str::replace($query, '"', '""')]);
+    public static function vbScript($query, $params = []){
+        $command = Prepare::Query($query, $params); 
+        return self::cmd('mshta vbscript:Execute(":query(window.close)")', ['query' => str::replace($command, '"', '""')]);
     }
 }

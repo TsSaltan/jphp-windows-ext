@@ -24,7 +24,9 @@ class Startup
         $return = [];
 
         foreach($items as $k=>$item){
-            $key = strtolower(implode('-', $item));
+            $key = strtolower(implode('-', $item)); // Чтоб убрать повторяющиеся элементы
+            if(isset($return[$key])) continue;
+            
             $return[$key] = new startupItem($item['title'], $item['command'], $item['location']);
         }
 
@@ -39,7 +41,7 @@ class Startup
         $startup = [];
 
         foreach($list as $v){
-            $startup[] = ['title' => $v['Caption'], 'command' => $v['Command'], 'location' => $this->expandRegPath($v['Location'])];
+            $startup[] = ['title' => $v['Caption'], 'command' => $v['Command'], 'location' => self::expandRegPath($v['Location'])];
         }
 
         return $startup;
@@ -48,13 +50,12 @@ class Startup
     /**
      * Загрузка элементов из реестра
      */
-    private static function loadRegistry(){
+    public static function loadRegistry(){
         $regPaths = [
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run',
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce',
             'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Run',
             'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\RunOnce',
-            'HKEY_USERS\.DEFAULT\Software\Microsoft\Windows\CurrentVersion\Run',
 
             // If added by Group Policy
             'HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer\Run',
@@ -69,7 +70,7 @@ class Startup
 
         foreach($regPaths as $path){
             try{
-                $reg = Registry::of($path)->readFully();
+                $reg = Registry::of($path)->readFully(true);
                 foreach($reg as $r){
                     foreach($r as $v){
                         $startup[] = ['title' => $v->key, 'command' => $v->value, 'location' => $r->path];
@@ -84,7 +85,7 @@ class Startup
     }
 
     /**
-     * Загрузка элементов из реестра
+     * @todo Загрузка отключенных в реестре
      */
     public static function loadDisabled(){
         $regPaths = [
@@ -104,8 +105,7 @@ class Startup
                 $reg = Registry::of($path)->readFully();
                 foreach($reg as $r){
                     foreach($r as $v){
-                        $startup[$r->path][] = [$v->key => $v->value, 'bin' => hex2bin($v->value)];
-                        //file_put_contents('F:\test_' . $v->key . '.bin', hex2bin($v->value));
+                        $startup[$r->path][] = [$v->key => $v->value];
                     }
                 }
 
@@ -141,7 +141,6 @@ class Startup
         $basename = basename($file);
         Windows::createShortcut($dir . '\\' . $basename . '.lnk', $file, $description);
         return self::find($file);
-        //return new startupItem($basename, $basename . '.lnk', 'Startup');
     }
 
     /**
