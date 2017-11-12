@@ -37,11 +37,13 @@ class WindowsScriptHost
      * Выполнить команду
      * @param string $command
      * @param array $params=array() параметры для замены (в запросе можно передать именованные параметры, как в PDO)
-     * @param string $charset='cp866' кодировка ответа (в командной строке по умолчанию cp866)
+     * @param string $charset кодировка ответа (в командной строке по умолчанию cp866). utf-8 возвращает всё на английском языке
      * @return string
      * @throws WindowsException
      */  
-    public static function cmd($command, $params = [], $charset = 'cp866'){
+    public static function cmd($command, $params = [], $charset = 'utf-8'){
+        if($charset == 'utf-8') $command = 'chcp 65001 | ' . $command;
+
         $command = Prepare::Query($command, $params);    
         return self::Exec(['cmd.exe', '/c', $command], true, $charset);  
     }
