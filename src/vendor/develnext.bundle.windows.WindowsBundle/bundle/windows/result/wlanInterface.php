@@ -197,8 +197,4 @@ class wlanInterface
         file_put_contents($tmpFile, $xml);
         return $tmpFile;
     }
-//    
-
-
-// C:\WINDOWS\system32>netsh interface set interface name="Беспроводная сеть" admin=enabled
 }
