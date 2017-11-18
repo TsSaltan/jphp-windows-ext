@@ -167,7 +167,7 @@ class wlanInterface
                             </SSID>
                         </SSIDConfig>
                         <connectionType>ESS</connectionType>
-                        <connectionMode>auto</connectionMode>
+                        <connectionMode>manual</connectionMode>
                         <MSM>
                             <security>'. (!$password ? 
                                 '<authEncryption>

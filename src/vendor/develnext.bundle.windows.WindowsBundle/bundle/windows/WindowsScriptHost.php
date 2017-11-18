@@ -12,6 +12,7 @@ use php\util\Regex;
 
 /**
  * Методы класса позволяют вызывать функции API Windows, выполнять системные скрипты
+ * @packages windows
  */
 class WindowsScriptHost
 {

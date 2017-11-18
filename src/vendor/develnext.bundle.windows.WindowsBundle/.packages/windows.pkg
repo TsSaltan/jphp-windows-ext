@@ -1,0 +1,9 @@
+[classes]
+bundle\windows\COM
+bundle\windows\Registry
+bundle\windows\Startup
+bundle\windows\Task
+bundle\windows\Windows
+bundle\windows\WindowsException
+bundle\windows\WindowsScriptHost
+bundle\windows\Wlan

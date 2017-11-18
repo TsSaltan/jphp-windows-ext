@@ -14,6 +14,9 @@ use php\time\Time;
 use php\time\TimeFormat;
 use php\util\Regex;
 
+/**
+ * @packages windows
+ */
 class Windows
 {
 
@@ -603,8 +606,8 @@ class Windows
      */
     public static function createShortcut($shortcut, $target, $description = null){
         return WSH::PowerShell('$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut(\':shortcut\'); $S.TargetPath = \':target\'; $S.Description = \':description\'; $S.Save()', [
-            'shortcut' => $shortcut,
-            'target' => $target,
+            'shortcut' => str::replace($shortcut, "'", "\\'"),
+            'target' => str::replace($target, "'", "\\'"),
             'description' => $description
         ]);
     }

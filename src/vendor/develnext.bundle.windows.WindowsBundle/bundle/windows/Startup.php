@@ -9,6 +9,7 @@ use bundle\windows\WindowsScriptHost as WSH;
 
 /**
  * Класс содержит функции для работы с автозапуском
+ * @packages windows
  */
 class Startup 
 {    
@@ -17,7 +18,7 @@ class Startup
      * Получить список программ, находящихся в автозагрузке
      * @return startupItem[]
      */
-    public static function getList(){
+    public static function getList() : array{
         $wmic = self::loadWMIC();
         $registry = self::loadRegistry();
         $items = array_merge($wmic, $registry);
@@ -36,7 +37,7 @@ class Startup
     /**
      * Загрузка элементов из WMI
      */
-    private static function loadWMIC(){
+    private static function loadWMIC() : array{
         $list = WSH::WMIC('startup get');
         $startup = [];
 
@@ -50,7 +51,7 @@ class Startup
     /**
      * Загрузка элементов из реестра
      */
-    public static function loadRegistry(){
+    public static function loadRegistry() : array{
         $regPaths = [
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Run',
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\RunOnce',
@@ -87,7 +88,7 @@ class Startup
     /**
      * @todo Загрузка отключенных в реестре
      */
-    public static function loadDisabled(){
+    public static function loadDisabled() : array {
         $regPaths = [
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run',
             'HKEY_LOCAL_MACHINE\Software\Microsoft\Windows\CurrentVersion\Explorer\StartupApproved\Run32',
@@ -116,7 +117,7 @@ class Startup
         return $startup;
     }
 
-    private static function expandRegPath($path){
+    private static function expandRegPath($path) : string {
         $reg = [
             'HKCR\\' => 'HKEY_CLASSES_ROOT\\',
             'HKCU\\' => 'HKEY_CURRENT_USER\\',
@@ -136,7 +137,7 @@ class Startup
      * @param string $description=null Описание
      * @return startupItem
      */
-    public static function add($file, $description = null){
+    public static function add($file, $description = null) : startupItem {
         $dir = self::getUserStartupDirectory();
         $basename = basename($file);
         Windows::createShortcut($dir . '\\' . $basename . '.lnk', $file, $description);
@@ -149,7 +150,7 @@ class Startup
      * @param string $file Путь к исполняемому файлу
      * @return startupItem
      */
-    public static function find($file){
+    public static function find($file) : startupItem {
         $list = self::getList();
         foreach($list as $item){
             if($item->file == $file){
@@ -166,7 +167,7 @@ class Startup
      * @param string $file Путь к исполняемому файлу
      * @return bool
      */
-    public static function isExists($file){
+    public static function isExists($file) : bool {
         return self::find($file) !== false;
     }
 
@@ -175,7 +176,7 @@ class Startup
      * Возвращает путь к пользовательской папке автозагрузки
      * @return string
      */
-    public static function getUserStartupDirectory(){
+    public static function getUserStartupDirectory() : string {
         return realpath(Windows::expandEnv('%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup'));
     }
     
@@ -184,7 +185,7 @@ class Startup
      * Возвращает путь к папке автозагрузки для программ
      * @return string
      */
-    public static function getCommonStartupDirectory(){
+    public static function getCommonStartupDirectory() : string {
         return realpath(Windows::expandEnv('%PROGRAMDATA%\Microsoft\Windows\Start Menu\Programs\Startup'));
     }
     

@@ -10,6 +10,7 @@ use bundle\windows\result\wlanInterface;
 
 /**
  * Wireless lan 
+ * @packages windows
  */
 class Wlan 
 {
