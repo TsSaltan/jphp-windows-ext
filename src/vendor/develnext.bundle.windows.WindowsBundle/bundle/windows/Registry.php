@@ -10,6 +10,7 @@ use bundle\windows\WindowsScriptHost as WSH;
 
 /**
  * Класс для работы с реестром Windows
+ * @packages windows
  */
 class Registry 
 {

@@ -7,6 +7,7 @@ use php\util\Regex;
 
 /**
  * Класс для работы с COM-портами
+ * @packages windows
  */
 class COM 
 {  
