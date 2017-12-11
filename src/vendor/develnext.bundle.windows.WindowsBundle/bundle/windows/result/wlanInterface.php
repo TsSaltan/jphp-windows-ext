@@ -42,6 +42,14 @@ class wlanInterface
      */
     public function getMac() : string {
         return $this->mac;
+    }     
+
+    /**
+     * Получить текущий профиль (обычно совпадает с именем подключённой сети)
+     */
+    public function getProfile() : string {
+        $params = $this->getParams();
+        return $params['Profile'] ?? null ;
     }   
     
     /**
@@ -65,7 +73,10 @@ class wlanInterface
     public function enable(){
         WSH::cmd('netsh interface set interface name=":interface" admin=enabled', ['interface' => $this->name]);
     }   
-     
+    
+    /**
+     * Отключиться от сети
+     */
     public function disconnect(){
         WSH::cmd('netsh wlan disconnect interface=":interface"', ['interface' => $this->name]);
     }
@@ -73,23 +84,25 @@ class wlanInterface
     /**
      * Подключиться к сети
      * @param  string  $ssid SSID сети
-     * @param  mixed $password пароль
+     * @param  mixed $password Пароль длиной минимум 8 символов, или NULL, если пароль не нужен, или false, чтоб использовать сохранённые в системе настройки
      * @throws WindowsException
      */
     public function connect($ssid, $password = false) : bool {
-        // Сначала удалим профиль, если он существует
-        WSH::cmd('netsh wlan delete profile name=":ssid" interface=":interface"', ['interface' => $this->name, 'ssid' => $ssid]);
-        
-        // 1. Создаём файл профиля с авторизационными данными
-        $file = $this->createConfig($ssid, $password);
-        $profile = WSH::cmd('netsh wlan add profile filename=":file"', ['file' => $file]);
-        unlink($file);
+    	if($password !== false){
+	        // Сначала удалим профиль, если он существует
+	        WSH::cmd('netsh wlan delete profile name=":ssid" interface=":interface"', ['interface' => $this->name, 'ssid' => $ssid]);
+	        
+	        // Создаём файл профиля с авторизационными данными
+	        $file = $this->createConfig($ssid, $password);
+	        $profile = WSH::cmd('netsh wlan add profile filename=":file"', ['file' => $file]);
+	        unlink($file);
 
-        if(str::contains($profile, 'error')){
-            throw new WindowsException($profile);
+	        if(str::contains($profile, 'error')){
+	            throw new WindowsException($profile);
+	        }
         }
-        
-        // 2. Подключаемся к сети  используя файл профиля
+
+        // Подключаемся к сети  используя файл профиля
         $connect = WSH::cmd('netsh wlan connect name=":ssid" interface=":interface"', ['interface' => $this->name, 'ssid' => $ssid]);
         if(str::contains($connect, 'Reason:')){
             throw new WindowsException(explode('Reason: ', $connect)[1]);
@@ -113,13 +126,24 @@ class wlanInterface
      * @return string disconnected, authenticating, connected, connecting
      */
     public function getState() : string {
+        $params = $this->getParams();
+        return $params['State'] ?? 'disconnected';
+    }
+
+    /**
+     * Получить список параметров текущего интерфейса
+     */
+    public function getParams() : array {
+        $params = [];
         $data = WSH::cmd('netsh wlan show interface name=":interface"', ['interface' => $this->name]);
-        $regex = Regex::of('State\s*:\s*([^\s]+)', Regex::MULTILINE)->with($data);
-        if($regex->find()){
-            return $regex->group(1);
+        $regexp = Regex::of('\s*([^:]+)\s+:([^\n]+)\n', Regex::MULTILINE)->with($data);
+        while ($regexp->find()){
+            $k = trim($regexp->group(1));
+            $v = trim($regexp->group(2));            
+            $params[$k] = $v;
         }
-        
-        return 'disconnected';
+
+        return $params;
     }
     
     /**
@@ -153,11 +177,11 @@ class wlanInterface
     /**
      * Генерация файла профиля (для авторизации в сети WiFi)
      * @param  string  $ssid     
-     * @param  mixed $password
+     * @param  string $password=null
      * @return string Путь к файлу
      * @todo Авторизация с WEP
      */
-    protected function createConfig($ssid, $password = false){
+    protected function createConfig(string $ssid, string $password = null) : string {
         $xml = '<?xml version="1.0"?>
                     <WLANProfile xmlns="http://www.microsoft.com/networking/WLAN/profile/v1">
                         <name>'. $ssid .'</name>
@@ -169,14 +193,13 @@ class wlanInterface
                         <connectionType>ESS</connectionType>
                         <connectionMode>manual</connectionMode>
                         <MSM>
-                            <security>'. (!$password ? 
+                            <security>'. (!is_null($password) ? 
                                 '<authEncryption>
                                     <authentication>open</authentication>
                     <encryption>none</encryption>
                     <useOneX>false</useOneX>
                                 </authEncryption>' :
- '
-                                <authEncryption>
+                               '<authEncryption>
                                     <authentication>WPA2PSK</authentication>
                                     <encryption>AES</encryption>
                                     <useOneX>false</useOneX>
