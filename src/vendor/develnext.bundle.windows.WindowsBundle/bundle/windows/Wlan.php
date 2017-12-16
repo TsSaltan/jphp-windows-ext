@@ -46,6 +46,14 @@ class Wlan
      */
     public static function isSupported() : bool {
         return !str::contains(WSH::cmd('netsh wlan show interfaces'), 'is not running');
+    }    
+
+    /**
+     * Получить используемый беспроводной интерфейс (идёт первый в списке интерфейсов)
+     * @return wlanInterface
+     */
+    public static function getMainInterface() : wlanInterface {
+        return self::getInterfaces()[0];
     }
     
 }

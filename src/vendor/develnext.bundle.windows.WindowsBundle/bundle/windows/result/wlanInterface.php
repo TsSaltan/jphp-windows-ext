@@ -82,6 +82,18 @@ class wlanInterface
     }
     
     /**
+     * Переподключиться к текущей сети
+     */
+    public function reconnect(){
+        $current = $this->getProfile();
+        $this->disconnect();
+
+        if(!is_null($current)){
+            $this->connect($current, false);
+        }
+    }
+
+    /**
      * Подключиться к сети
      * @param  string  $ssid SSID сети
      * @param  mixed $password Пароль длиной минимум 8 символов, или NULL, если пароль не нужен, или false, чтоб использовать сохранённые в системе настройки

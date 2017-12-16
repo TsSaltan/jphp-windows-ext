@@ -353,11 +353,20 @@ class Windows
 
     /**
      * --RU--
-     * Получить объем оперативной памяти
+     * Получить полный объем оперативной памяти (в байтах)
      * @return int
      */
-    public static function getTotalRAM(){
+    public static function getTotalRAM() : int {
         return intval(WSH::WMIC('path Win32_ComputerSystem get TotalPhysicalMemory')[0]['TotalPhysicalMemory']);
+    }
+
+    /**
+     * --RU--
+     * Получить объем свободной оперативной памяти (в байтах)
+     * @return int
+     */
+    public static function getFreeRAM() : int {
+        return self::getOS()['FreePhysicalMemory'] * 1024;
     }
 
     /**
