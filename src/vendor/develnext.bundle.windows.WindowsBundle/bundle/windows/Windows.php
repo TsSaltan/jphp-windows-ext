@@ -795,5 +795,22 @@ PS;
         return WSH::CMD('echo :date | date', ['date' => $date]);
     }
 
+    /**
+     * Извлекает и сохраняет отображаемую в проводнике иконку файла
+     * @param string $file Файл, откуда будет извлечена иконка 
+     * @param string $icon Путь для сохранения иконки, поддерживаются форматы PNG, JPG, ICO, GIF 
+     */
+    public static function extractIcon(string $file, string $icon) : bool {
+        if(!fs::exists($file)) throw new WindowsException('File "'. $file .'" does not found');
+        fs::delete($icon);
+        WSH::PowerShell(
+            '[System.Reflection.Assembly]::LoadWithPartialName(\'System.Drawing\'); '.
+            '[System.Drawing.Icon]::ExtractAssociatedIcon(\':file\').ToBitmap().Save(\':icon\')',  
+            ['file' => realpath($file), 'icon' => $icon]
+        );
+        
+        return fs::exists($icon);
+    }
+
 
 }
