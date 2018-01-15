@@ -6,12 +6,14 @@ use bundle\windows\Registry;
 use bundle\windows\Task;
 use Exception;
 use php\gui\UXApplication;
+use php\gui\UXImage;
 use php\io\MiscStream;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
 use php\time\Time;
 use php\time\TimeFormat;
+use php\time\Timer;
 use php\util\Regex;
 
 /**
@@ -810,6 +812,41 @@ PS;
         );
         
         return fs::exists($icon);
+    }
+
+    /**
+     * Получить системный путь, по которому расположено изображение с обоями
+     * @return string
+     */
+    protected static function getWallpaperPath() : string {
+        return self::expandEnv('%AppData%\Microsoft\Windows\Themes\TranscodedWallpaper');
+    }      
+    
+    /**
+     * Получить изображение с текущими обоями
+     * @return UXImage
+     */
+    public static function getWallpaper() : UXImage {
+        return new UXImage(self::getWallpaperPath());
+    }    
+    
+    /**
+     * Установить обои
+     * @param string|UXImage $image
+     */
+    public static function setWallpaper($image){
+        /** @var UXImage $image **/
+        $image = $image instanceof UXImage ? $image : new UXImage($image);
+        $image->save(self::getWallpaperPath(), 'jpg');
+        
+        // Грязный хак для обновления картинки рабочего стола
+        // 100% рабочий вариант - перезапуск explorer.exe, но это занимает много времени
+        for($i = 0; $i < 15; ++$i){
+            Timer::setTimeout(function(){
+                $upd = 'RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters ,2 ,True';
+                WSH::cmd($upd); 
+            }, 1500 * $i);
+        }
     }
 
 
