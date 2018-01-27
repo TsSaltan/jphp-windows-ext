@@ -1,6 +1,7 @@
 <?php
 namespace bundle\windows;
 
+use std;
 use bundle\windows\Prepare;
 use bundle\windows\WindowsException;
 use bundle\windows\result\wshResult;
@@ -43,8 +44,10 @@ class WindowsScriptHost
      * @throws WindowsException
      */  
     public static function cmd($command, $params = [], $charset = 'utf-8'){
-        if($charset == 'utf-8') $command = 'chcp 65001 | ' . $command;
-
+        if($charset == 'utf-8') $chcp = 65001;
+        else $chcp = str_replace(['cp', 'windows', '-'], '', $charset);
+        
+        $command = 'chcp ' . $chcp . ' | ' . $command;
         $command = Prepare::Query($command, $params);    
         return self::Exec(['cmd.exe', '/c', $command], true, $charset);  
     }
@@ -57,7 +60,9 @@ class WindowsScriptHost
      * @throws WindowsException
      */
     public static function WMIC($query){
-        $data = self::cmd('WMIC :query /Format:List | more', ['query' => $query]);
+        // more убирает лишние байты возле символа переноса строки, что значительно упрощает парсинг 
+        // cp866 не должно конфликтовать с more
+        $data = self::cmd('WMIC :query /Format:List | more', ['query' => $query], 'cp866');
 
         $reg = '([^\n=]+)=([^\n\r]+)';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($data);
