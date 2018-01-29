@@ -205,7 +205,7 @@ class wlanInterface
                         <connectionType>ESS</connectionType>
                         <connectionMode>manual</connectionMode>
                         <MSM>
-                            <security>'. (!is_null($password) ? 
+                            <security>'. (is_null($password) ? 
                                 '<authEncryption>
                                     <authentication>open</authentication>
                     <encryption>none</encryption>
