@@ -7,6 +7,7 @@ use bundle\windows\Task;
 use Exception;
 use php\gui\UXApplication;
 use php\gui\UXImage;
+use php\io\File;
 use php\io\MiscStream;
 use php\lang\System;
 use php\lib\fs;
@@ -819,7 +820,14 @@ PS;
      * @return string
      */
     protected static function getWallpaperPath() : string {
-        return self::expandEnv('%AppData%\Microsoft\Windows\Themes\TranscodedWallpaper');
+        $path = self::expandEnv('%AppData%\\Microsoft\\Windows\\Themes');
+        foreach (File::of($path)->findFiles() as $file){
+            if(str::startsWith($file->getName(), 'TranscodedWallpaper')){
+                return $file->getAbsolutePath();
+            }
+        }
+
+        return false;
     }      
     
     /**
