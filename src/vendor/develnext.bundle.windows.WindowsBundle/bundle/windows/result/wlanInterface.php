@@ -50,6 +50,27 @@ class wlanInterface
     public function getProfile() : string {
         $params = $this->getParams();
         return $params['Profile'] ?? null ;
+    }    
+
+    /**
+     * Получить пароль текущего профиля
+     */
+    public function getPassword() : string {
+        $temp = Windows::getTemp();
+
+        $profile = WSH::cmd('netsh wlan show profile name=":name" interface=":interface" key=clear', [
+            'name' => $this->getProfile(),
+            'interface' => $this->name
+        ]);
+
+       
+        $regexp = Regex::of('\s*([^:]+)\s+:([^\n]+)\n', Regex::MULTILINE)->with($profile);
+        while ($regexp->find()){
+            $k = trim($regexp->group(1));
+            $v = trim($regexp->group(2));            
+            if(str::lower($k) == 'key content') return $v;
+        }
+        return false;
     }   
     
     /**
@@ -100,18 +121,18 @@ class wlanInterface
      * @throws WindowsException
      */
     public function connect($ssid, $password = false) : bool {
-    	if($password !== false){
-	        // Сначала удалим профиль, если он существует
-	        WSH::cmd('netsh wlan delete profile name=":ssid" interface=":interface"', ['interface' => $this->name, 'ssid' => $ssid]);
-	        
-	        // Создаём файл профиля с авторизационными данными
-	        $file = $this->createConfig($ssid, $password);
-	        $profile = WSH::cmd('netsh wlan add profile filename=":file"', ['file' => $file]);
-	        unlink($file);
+        if($password !== false){
+            // Сначала удалим профиль, если он существует
+            WSH::cmd('netsh wlan delete profile name=":ssid" interface=":interface"', ['interface' => $this->name, 'ssid' => $ssid]);
+            
+            // Создаём файл профиля с авторизационными данными
+            $file = $this->createConfig($ssid, $password);
+            $profile = WSH::cmd('netsh wlan add profile filename=":file"', ['file' => $file]);
+            unlink($file);
 
-	        if(str::contains($profile, 'error')){
-	            throw new WindowsException($profile);
-	        }
+            if(str::contains($profile, 'error')){
+                throw new WindowsException($profile);
+            }
         }
 
         // Подключаемся к сети  используя файл профиля
