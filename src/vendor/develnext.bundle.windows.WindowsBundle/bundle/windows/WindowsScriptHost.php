@@ -49,7 +49,7 @@ class WindowsScriptHost
         
         $command = 'chcp ' . $chcp . ' | ' . $command;
         $command = Prepare::Query($command, $params);    
-        return self::Exec(['cmd.exe', '/c', $command], true, $charset);  
+        return self::Exec([Windows::getSystem32() . 'cmd.exe', '/c', $command], true, $charset);  
     }
     
     /**
@@ -62,7 +62,7 @@ class WindowsScriptHost
     public static function WMIC($query){
         // more убирает лишние байты возле символа переноса строки, что значительно упрощает парсинг 
         // cp866 не должно конфликтовать с more
-        $data = self::cmd('WMIC :query /Format:List | more', ['query' => $query], 'cp866');
+        $data = self::cmd(Windows::getSystem32() . 'wbem' . Windows::DS . 'wmic :query /Format:List | more', ['query' => $query], 'cp866');
 
         $reg = '([^\n=]+)=([^\n\r]+)';
         $regex = Regex::of($reg, Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($data);

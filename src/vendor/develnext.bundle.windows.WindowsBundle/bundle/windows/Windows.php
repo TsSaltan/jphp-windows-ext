@@ -22,6 +22,11 @@ use php\util\Regex;
  */
 class Windows
 {
+	/**
+	 * Directory separator
+	 * @var string
+	 */
+	const DS = "\\";
 
     /**
      * --RU--
@@ -108,12 +113,13 @@ class Windows
             break;
 
             case 'jar':
+            	// если не установлена java и не прописан java_home, может быть ошибка
                 $cmd = 'javaw.exe'; // javaw запускает jar без консоли
                 $params = array_merge(['-jar'], $argv);
             break;
 
             default:
-                $cmd = 'cmd.exe';
+                $cmd = self::getSystem32() . 'cmd.exe';
                 $params = array_merge(['/c'], $argv);
 
         }
@@ -851,11 +857,17 @@ PS;
         // 100% рабочий вариант - перезапуск explorer.exe, но это занимает много времени
         for($i = 0; $i < 15; ++$i){
             Timer::setTimeout(function(){
-                $upd = 'RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters ,2 ,True';
+                $upd = self::getSystem32() . 'RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters ,2 ,True';
                 WSH::cmd($upd); 
             }, 1500 * $i);
         }
     }
 
-
+    /**
+     * Путь к системной папке windows\system32
+     * @return string
+     */
+    public static function getSystem32() : string {
+    	return ($_ENV['SystemRoot'] ?? 'C:\\Windows') . '\\System32\\';
+    }
 }
