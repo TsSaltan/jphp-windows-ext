@@ -62,13 +62,14 @@ class wlanInterface
             'name' => $this->getProfile(),
             'interface' => $this->name
         ]);
-
        
-        $regexp = Regex::of('\s*([^:]+)\s+:([^\n]+)\n', Regex::MULTILINE)->with($profile);
+        $regexp = Regex::of('\n([^:\n]+)\s+:([^\n]+)', Regex::MULTILINE)->with($profile);
         while ($regexp->find()){
-            $k = trim($regexp->group(1));
-            $v = trim($regexp->group(2));            
-            if(str::lower($k) == 'key content') return $v;
+            $k = str::lower(trim($regexp->group(1)));
+            $v = trim($regexp->group(2));   
+            
+            // win7 fix: между словами key и content какой-то знак, не являющийся пробелом, поэтому определяем ключ таким образом
+            if(str::contains($k, 'key') && str::contains($k, 'content')) return $v;
         }
         return false;
     }   
