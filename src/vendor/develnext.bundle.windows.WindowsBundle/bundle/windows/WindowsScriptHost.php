@@ -47,7 +47,7 @@ class WindowsScriptHost
         if($charset == 'utf-8') $chcp = 65001;
         else $chcp = str_replace(['cp', 'windows', '-'], '', $charset);
         
-        $command = 'chcp ' . $chcp . ' | ' . $command;
+        $command = Windows::getSystem32() . 'chcp ' . $chcp . ' | ' . $command;
         $command = Prepare::Query($command, $params);    
         return self::Exec([Windows::getSystem32() . 'cmd.exe', '/c', $command], true, $charset);  
     }
@@ -104,7 +104,7 @@ class WindowsScriptHost
     public static function vbScript($query, $params = []){
         $command = Prepare::Query($query, $params); 
 
-        $cmd = new Prepare('mshta.exe vbscript:Execute(":query(window.close)")');
+        $cmd = new Prepare(Windows::getSystem32() . 'mshta.exe vbscript:Execute(":query(window.close)")');
         $cmd->addStringQuotes = false;
         $cmd->quotesPolicy = 2;
         return self::cmd($cmd->getQuery(['query' => $command]));
