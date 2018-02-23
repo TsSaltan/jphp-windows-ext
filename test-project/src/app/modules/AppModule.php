@@ -9,6 +9,7 @@ use php\gui\framework\AbstractModule;
 use php\gui\framework\ScriptEvent; 
 
 use bundle\windows\Windows;
+use bundle\windows\WindowsScriptHost as WSH;
 
 
 class AppModule extends AbstractModule
@@ -28,7 +29,9 @@ class AppModule extends AbstractModule
             }
             return false;
         });
-        
+//        var_dump(WSH::PowerShell('write-host "asd"'));
+        //var_dump(Windows::extractIcon('F:\DevelNextBundles\DevelNext-Windows\gradlew.bat', 'D:/index.png'));
+        //die(123);
         //var_dump(Windows::isInternetAvaliable());
     }
     

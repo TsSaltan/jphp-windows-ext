@@ -3,8 +3,8 @@
   "components": {
     "fileChooser": {
       "type": "script\\FileChooserScript",
-      "x": 160.0,
-      "y": 176.0,
+      "x": 160,
+      "y": 176,
       "props": {
         "filterName": "Все файлы",
         "filterExtensions": "*.*",
