@@ -722,7 +722,9 @@ class Windows
         return self::psAudioQuery('Mute') == 'True';     
     }
 
-    private static $psAudioClass = <<<PS
+    private static function psAudioQuery($key, $value = null){   
+        $psAudioClass = <<<PS
+        Add-Type -Language CSharpVersion3 -TypeDefinition @"
         using System.Runtime.InteropServices;
      
         [Guid("5CDF2C82-841E-4546-9722-0CF74078229A"), InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
@@ -765,18 +767,13 @@ class Windows
             set { Marshal.ThrowExceptionForHR(Vol().SetMute(value, System.Guid.Empty)); }
           }
         }
-PS;
+"@
 
-    private static function psAudioQuery($key, $value = null){          
-        $params['class'] = base64_encode(str_replace(["\t", "  "], '', self::$psAudioClass));
+PS;
         $params['key'] = $key;
         $params['value'] = $value;
 
-        return WSH::PowerShell(
-            '[string]$code = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\':class\')); '.
-            'Add-Type -Language CSharpVersion3 -TypeDefinition $code; [ audio ]:::key'. (!is_null($value) ? ' = :value' : ''),
-            $params
-        );
+        return WSH::PowerShell( $psAudioClass . '[ audio ]:::key'. (!is_null($value) ? ' = :value' : ''), $params);
     }
 
     /**
@@ -851,16 +848,34 @@ PS;
     public static function setWallpaper($image){
         /** @var UXImage $image **/
         $image = $image instanceof UXImage ? $image : new UXImage($image);
-        $image->save(self::getWallpaperPath(), 'jpg');
-        
-        // Грязный хак для обновления картинки рабочего стола
-        // 100% рабочий вариант - перезапуск explorer.exe, но это занимает много времени
-        for($i = 0; $i < 15; ++$i){
-            Timer::setTimeout(function(){
-                $upd = self::getSystem32() . 'RUNDLL32.EXE USER32.DLL,UpdatePerUserSystemParameters ,2 ,True';
-                WSH::cmd($upd); 
-            }, 1500 * $i);
-        }
+        $image->save(self::getWallpaperPath(), 'jpg'); // Формат jpeg, т.к. на win7 обои кодируются в этот формат
+
+        self::updateDesktopWallpaper();
+    }
+
+    /**
+     * Визуальное обновление обоев на рабочем столе
+     * (вместо перезапуска explorer'a)
+     */
+    protected static function updateDesktopWallpaper(){
+        $psCommand = <<<PS
+            Add-Type -Language CSharpVersion3 -TypeDefinition @"
+            using System;
+            using System.Runtime.InteropServices;
+
+            public class Params
+            {
+                [DllImport("User32.dll",CharSet=CharSet.Unicode)]
+                public static extern int SystemParametersInfo (Int32 uAction,
+                                                               Int32 uParam,
+                                                               String lpvParam,
+                                                               Int32 fuWinIni);
+            }
+"@
+
+            [Params]::SystemParametersInfo(0x0014, 0, ":wallpaperPath", 0x01 -bor 0x02)
+PS;
+        WSH::PowerShell($psCommand, ['wallpaperPath' => self::getWallpaperPath()]);
     }
 
     /**
