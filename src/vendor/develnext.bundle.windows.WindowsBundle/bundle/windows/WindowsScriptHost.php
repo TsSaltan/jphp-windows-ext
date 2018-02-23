@@ -89,9 +89,8 @@ class WindowsScriptHost
      * @throws WindowsException
      */
     public static function PowerShell($query, $params = [], $wait = true){
-        $source = str_replace(["\t", "   ", "  "], null, Prepare::Query($query, $params));
+        $source = Prepare::Query($query, $params);
         $command = 'Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\'' . base64_encode($source) . '\')))'; 
-
         return self::Exec(['powershell.exe', '-inputformat', 'none', '-command', $command], $wait, 'utf-8');  
     }
     
