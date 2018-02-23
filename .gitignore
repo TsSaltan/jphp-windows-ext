@@ -5,3 +5,19 @@ build/*
 .gradle/
 
 *.iml
+
+test-project/.dn
+
+test-project/vendor
+test-project/src_generated
+test-project/src/JPHP-INF
+test-project/src/.debug
+test-project/build
+test-project/build.xml
+test-project/build.gradle
+test-project/settings.gradle
+
+*.log
+*.pid
+*.tmp
+*.sourcemap
