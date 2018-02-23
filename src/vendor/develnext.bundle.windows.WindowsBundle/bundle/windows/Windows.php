@@ -773,7 +773,7 @@ PS;
         $params['key'] = $key;
         $params['value'] = $value;
 
-        return WSH::PowerShell( $psAudioClass . '[ audio ]:::key'. (!is_null($value) ? ' = :value' : ''), $params);
+        return WSH::PowerShell( $psAudioClass . '[Audio]:::key'. (!is_null($value) ? ' = :value' : ''), $params);
     }
 
     /**
