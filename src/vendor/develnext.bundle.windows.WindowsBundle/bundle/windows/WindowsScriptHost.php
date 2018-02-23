@@ -81,7 +81,7 @@ class WindowsScriptHost
     
     /**
      * --RU--
-     * Выполнить скрипт PowerShell (должен располагаться в одну строку)
+     * Выполнить скрипт PowerShell
      * @param string $query
      * @param array $params=array() параметры для замены
      * @param bool $wait=true ожидать окончания
@@ -89,8 +89,10 @@ class WindowsScriptHost
      * @throws WindowsException
      */
     public static function PowerShell($query, $params = [], $wait = true){
-        $command = Prepare::Query($query, $params); 
-        return self::Exec(['powershell.exe', '-inputformat', 'none', '-command', $command], $wait);  
+        $source = str_replace(["\t", "   ", "  "], null, Prepare::Query($query, $params));
+        $command = 'Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\'' . base64_encode($source) . '\')))'; 
+
+        return self::Exec(['powershell.exe', '-inputformat', 'none', '-command', $command], $wait, 'utf-8');  
     }
     
     /**
