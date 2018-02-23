@@ -22,11 +22,11 @@ use php\util\Regex;
  */
 class Windows
 {
-	/**
-	 * Directory separator
-	 * @var string
-	 */
-	const DS = "\\";
+    /**
+     * Directory separator
+     * @var string
+     */
+    const DS = "\\";
 
     /**
      * --RU--
@@ -113,7 +113,7 @@ class Windows
             break;
 
             case 'jar':
-            	// если не установлена java и не прописан java_home, может быть ошибка
+                // если не установлена java и не прописан java_home, может быть ошибка
                 $cmd = 'javaw.exe'; // javaw запускает jar без консоли
                 $params = array_merge(['-jar'], $argv);
             break;
@@ -868,6 +868,57 @@ PS;
      * @return string
      */
     public static function getSystem32() : string {
-    	return ($_ENV['SystemRoot'] ?? 'C:\\Windows') . '\\System32\\';
+        return ($_ENV['SystemRoot'] ?? 'C:\\Windows') . '\\System32\\';
+    }
+
+    /**
+     * Ping
+     * @param  string 	$domain Домен или ip адрес
+     * @param  int		$count  Количество запросов
+     * @param  int		$length Размер блока
+     * @return array 	[min => ms, max => ms, avg => ms, lost => %]
+     */
+    public static function ping(string $domain, int $count = 1, int $length = 32) : array {
+    	$return = [
+    		'min' => false,
+    		'max' => false,
+    		'avg' => false,
+    		'lost' => 0,
+    	];
+
+    	$answer = WSH::cmd(self::getSystem32() . 'ping :domain -n :count -l :length', [
+    		'domain' => $domain,
+    		'count' => $count,
+    		'length' => $length,
+    	]);
+
+    	$times = Regex::of('\s([A-Z][a-z]+)[\s=]+(\d+)ms', Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($answer);
+    	while($times->find()){
+    		$keys = [
+    			'Minimum' => 'min',
+    			'Maximum' => 'max',
+    			'Average' => 'avg',
+    		];
+    		$k = $times->group(1);
+
+    		if(isset($keys[$k])){
+    			$return[$keys[$k]] = intval($times->group(2));
+    		}
+    	}
+
+    	$lost = Regex::of('\((\d+)% loss\)', Regex::CASE_INSENSITIVE + Regex::MULTILINE)->with($answer);
+    	if($lost->find()){
+    		$return['lost'] = intval($lost->group(1));
+    	}
+
+    	return $return;
+    }
+
+    /**
+     * Проверить наличие Интернет-соединения
+     * @return bool
+     */
+    public static function isInternetAvaliable() : bool {
+    	return self::ping('google.com', 1)['avg'] > 0;
     }
 }
