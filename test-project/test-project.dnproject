@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project author="Ts.Saltan" authorOS="Windows 10" createdAt="1503514690252" ideName="DevelNext" ideVersion="16.7.0" ideVersionHash="2017103112" name="test-project" packageName="app" template="ide\project\templates\DefaultGuiProjectTemplate" updatedAt="1519414511588">
+<project author="Ts.Saltan" authorOS="Windows 10" createdAt="1503514690252" ideName="DevelNext" ideVersion="16.7.0" ideVersionHash="2017103112" name="test-project" packageName="app" template="ide\project\templates\DefaultGuiProjectTemplate" updatedAt="1519757701636">
   <tree>
     <expanded>
     <path src=""/>
@@ -8,16 +8,19 @@
       <path src="/src/app"/>
       <path src="/src/app/forms"/>
       <path src="/src/app/modules"/>
+      <path src="/vendor"/>
     </expanded>
   </tree>
   <openedFiles>
-  <file selected="1" src="test-project.dnproject"/>
+  <file src="test-project.dnproject"/>
     <file src="src/app/modules/MainModule.php"/>
     <file src="src/app/forms/MainForm.php"/>
     <file src="src/app/modules/AppModule.php"/>
     <file src="src/app/forms/WallpaperForm.php"/>
     <file src="src/app/forms/AudioAndBrightForm.php"/>
     <file src="src/app/forms/PingForm.php"/>
+    <file src="src/app/forms/MetadataForm.php"/>
+    <file selected="1" src="src/app/forms/LayoutForm.php"/>
   </openedFiles>
   <files/>
   <behaviours>

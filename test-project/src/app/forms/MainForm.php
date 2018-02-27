@@ -14,6 +14,7 @@ class MainForm extends AbstractForm
      * @event button.action 
      * @event buttonAlt.action 
      * @event button3.action 
+     * @event button4.action 
      */
     function doButtonAction(UXEvent $e = null)
     {    
