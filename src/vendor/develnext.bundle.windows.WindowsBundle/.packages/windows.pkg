@@ -1,4 +1,5 @@
 [classes]
+bundle\windows\api\CSharp
 bundle\windows\COM
 bundle\windows\Registry
 bundle\windows\Startup
