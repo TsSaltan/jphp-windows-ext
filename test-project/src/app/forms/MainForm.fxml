@@ -25,5 +25,11 @@
       </font>
     </Button>
     <Data cursor="DEFAULT" enabled="1" id="data-button4" visible="1"/>
+    <Button alignment="CENTER" contentDisplay="LEFT" ellipsisString="..." focusTraversable="true" graphicTextGap="4" id="button5" layoutX="8" layoutY="168" prefHeight="32" prefWidth="144" styleClass="button " text="LANForm" textAlignment="CENTER" underline="false" wrapText="false">
+      <font>
+        <Font name="System Regular" size="12"/>
+      </font>
+    </Button>
+    <Data cursor="DEFAULT" enabled="1" id="data-button5" visible="1"/>
   </children>
 </AnchorPane>
