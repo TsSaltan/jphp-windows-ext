@@ -120,7 +120,7 @@ class Windows
             break;
 
             default:
-                $cmd = self::getSystem32() . 'cmd.exe';
+                $cmd = self::getSystem32('cmd.exe');
                 $params = array_merge(['/c'], $argv);
 
         }
@@ -881,10 +881,26 @@ PS;
 
     /**
      * Путь к системной папке windows\system32
+     *  
      * @return string
      */
-    public static function getSystem32() : string {
-        return ($_ENV['SystemRoot'] ?? 'C:\\Windows') . '\\System32\\';
+    public static function getSystem32($path) : string {
+        return 'C:\\Windows\\System32\\' . $path;
+    }    
+
+    /**
+     * Если 32-битный процесс запущен в 64-битной системе, то он не может
+     * запустить 64 битный powershell, для этого монтируется виртуальная 
+     * директория SysNative, если запустить оттуда, запущенный процесс будет 64-битный
+     *
+     * @return string
+     * @todo test on x86
+     * @todo test on win7
+     */
+    public static function getSysNative($path) : string {
+        return fs::exists('C:\\Windows\\SysNative\\' . $path) 
+                ? ('C:\\Windows\\SysNative\\' . $path) 
+                : ('C:\\Windows\\System32\\' . $path);
     }
 
     /**
@@ -902,7 +918,7 @@ PS;
     		'lost' => 0,
     	];
 
-    	$answer = WSH::cmd(self::getSystem32() . 'ping :domain -n :count -l :length', [
+    	$answer = WSH::cmd(self::getSystem32('ping.exe') . ' :domain -n :count -l :length', [
     		'domain' => $domain,
     		'count' => $count,
     		'length' => $length,
@@ -1306,5 +1322,43 @@ PS;
             default:
               return "unknown ($code)";
         }
+    }
+
+    /**
+     * Возвращает ProductKey системы
+     * @return string
+     * @todo test on win7
+     */
+    public static function getProductKey() : string {
+        $psCommand = <<<PS
+            \$hklm = 2147483650
+            \$regPath = "Software\\Microsoft\\Windows NT\\CurrentVersion"
+            \$regValue = "DigitalProductId"
+    
+            \$productKey = \$null
+            \$win32os = \$null
+            \$wmi = [WMIClass]"\\\\.\\root\\default:stdRegProv"
+            \$data = \$wmi.GetBinaryValue(\$hklm,\$regPath,\$regValue)
+            \$binArray = (\$data.uValue)[52..66]
+
+            \$charsArray = "B","C","D","F","G","H","J","K","M","P","Q","R","T","V","W","X","Y","2","3","4","6","7","8","9"
+            ## decrypt base24 encoded binary data
+            For (\$i = 24; \$i -ge 0; \$i--) {
+                \$k = 0
+                For (\$j = 14; \$j -ge 0; \$j--) {
+                    \$k = \$k * 256 -bxor \$binArray[\$j]
+                    \$binArray[\$j] = [math]::truncate(\$k / 24)
+                    \$k = \$k % 24
+                }
+                \$productKey = \$charsArray[\$k] + \$productKey
+                If ((\$i % 5 -eq 0) -and (\$i -ne 0)) {
+                    \$productKey = "-" + \$productKey
+                }
+            }
+            Write-Host \$productkey
+PS;
+
+var_dump($psCommand);
+        return WSH::PowerShell($psCommand, [], true, true);
     }
 }
