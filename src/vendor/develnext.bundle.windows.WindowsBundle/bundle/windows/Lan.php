@@ -25,8 +25,9 @@ class Lan
         $adapterName = false;
 
         $cmd = WSH::cmd('ipconfig /all');
-        $scanner = (new Scanner($cmd))->useDelimiter(Regex::of('\n', Regex::MULTILINE));
+        $nic = WSH::WMIC('nic get');
 
+        $scanner = (new Scanner($cmd))->useDelimiter(Regex::of('\n', Regex::MULTILINE));
         while($scanner->hasNextLine()){
             $scanner->next();
             $line = $scanner->current();
@@ -42,6 +43,21 @@ class Lan
                     else $adapters[$adapterName][$key] = trim($regParam->group(2));
                 }
             }
+        }
+
+        foreach($nic as $k => $v){
+            if(!isset($v['NetConnectionID'])) continue;
+            if(!isset($adapters[$v['NetConnectionID']])){
+                $adapters[$v['NetConnectionID']] = [
+                    'Description' => $v['Description'],
+                    'Physical Address' => $v['MACAddress'],
+                ];
+            }
+
+            $adapters[$v['NetConnectionID']]['Speed'] = $v['Speed'] ?? 0;
+            $adapters[$v['NetConnectionID']]['Manufacturer'] = $v['Manufacturer'] ?? '';
+            $adapters[$v['NetConnectionID']]['Manufacturer'] = $v['Manufacturer'] ?? '';
+            $adapters[$v['NetConnectionID']]['NetEnabled'] = isset($v['NetEnabled']) && $v['NetEnabled'] == 'TRUE';
         }
         
         foreach ($adapters as $name => $params) {

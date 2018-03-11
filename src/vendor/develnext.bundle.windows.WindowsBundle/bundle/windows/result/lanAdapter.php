@@ -25,8 +25,8 @@ class lanAdapter
         $this->params = $params;
 
         $this->device = $params['Description'] ?? null;
-        $this->ipv4 = isset($params['IPv4 Address']) ? str_replace('(Preferred)', '', $params['IPv4 Address']) : null;
-        $this->ipv6 = str_replace('(Preferred)', '', ($params['IPv6 Address'] ?? $params['Link-local IPv6 Address'] ?? null));
+        $this->ipv4 = isset($params['IPv4 Address']) ? str_replace(['%5','(Preferred)'], '', $params['IPv4 Address']) : null;
+        $this->ipv6 = str_replace(['%5','(Preferred)'], '', ($params['IPv6 Address'] ?? $params['Link-local IPv6 Address'] ?? null));
 
         $this->mac = $params['Physical Address'] ?? null;
 
@@ -75,24 +75,38 @@ class lanAdapter
     }     
 
     /**
-     * Используется ли сеть в данный момент
+     * Доступна ли сеть на данном адаптере
      */
-    public function isActive() : bool {
-        return isset($this->params['Lease Obtained']) || isset($this->params['DNS Servers']);
+    public function isNetworkEnabled() : bool {
+        return $this->params['NetEnabled'] ?? false;
+    }  
+
+    /**
+     * Подключен ли сетевой кабель
+     */
+    public function isConnected() : bool {
+        return str::contains(WSH::cmd('netsh interface show interface name=":adapter"', ['adapter' => $this->name]), 'Connected');
+    } 
+
+    /**
+     * Подключен ли сетевой кабель
+     */
+    public function isEnabled() : bool {
+        return str::contains(WSH::cmd('netsh interface show interface name=":adapter"', ['adapter' => $this->name]), 'Enabled');
     }     
 
 /******************/
     /**
      * Отключить адаптер (нужны права администратора)
      */
-    public function disable(){
-        WSH::cmd('netsh interface set interface name=":adapter" admin=disabled', ['adapter' => $this->name]);
+    public function disable() : bool {
+        return strlen(WSH::cmd('netsh interface set interface name=":adapter" admin=disabled', ['adapter' => $this->name])) == 0;
     }    
         
     /**
      * Включить интерфейс (нужны права администратора)
      */
-    public function enable(){
-        WSH::cmd('netsh interface set interface name=":adapter" admin=enabled', ['adapter' => $this->name]);
+    public function enable() : bool {
+        return strlen(WSH::cmd('netsh interface set interface name=":adapter" admin=enabled', ['adapter' => $this->name])) == 0;
     }   
 }
