@@ -1,6 +1,11 @@
 <?php
 namespace app\modules;
 
+use php\lang\Process;
+use behaviour\custom\DropShadowEffectBehaviour;
+use php\util\Regex;
+use php\util\Scanner;
+use php\io\MemoryStream;
 use php\lib\str;
 use php\lang\System;
 use php\framework\Logger;
@@ -9,6 +14,7 @@ use php\gui\framework\AbstractModule;
 use php\gui\framework\ScriptEvent; 
 
 use bundle\windows\Windows;
+use bundle\windows\Registry;
 use bundle\windows\WindowsScriptHost as WSH;
 
 
@@ -33,6 +39,7 @@ class AppModule extends AbstractModule
         //var_dump(Windows::extractIcon('F:\DevelNextBundles\DevelNext-Windows\gradlew.bat', 'D:/index.png'));
         //die(123);
         //var_dump(Windows::isInternetAvaliable());
+        $this->getProductKey();
     }
     
     public static function getCurrentDir(){
@@ -40,5 +47,9 @@ class AppModule extends AbstractModule
         $sep = System::getProperty("path.separator");
         return dirname(realpath(str::split($path, $sep)[0])) . '\\';
     }
-
+    
+    
+    function getProductKey(){
+        var_dump(Windows::getProductKey());
+    }
 }
