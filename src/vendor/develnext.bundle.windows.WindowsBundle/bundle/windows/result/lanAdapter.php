@@ -89,7 +89,7 @@ class lanAdapter
     } 
 
     /**
-     * Подключен ли сетевой кабель
+     * Включен ли адаптер
      */
     public function isEnabled() : bool {
         return str::contains(WSH::cmd('netsh interface show interface name=":adapter"', ['adapter' => $this->name]), 'Enabled');
