@@ -35,11 +35,12 @@ class AppModule extends AbstractModule
             }
             return false;
         });
+        
 //        var_dump(WSH::PowerShell('write-host "asd"'));
         //var_dump(Windows::extractIcon('F:\DevelNextBundles\DevelNext-Windows\gradlew.bat', 'D:/index.png'));
         //die(123);
         //var_dump(Windows::isInternetAvaliable());
-        $this->getProductKey();
+        //$this->getProductKey();
     }
     
     public static function getCurrentDir(){
