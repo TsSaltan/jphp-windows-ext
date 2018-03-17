@@ -20,16 +20,14 @@ class lanAdapter
     private $mac;
     
     public function __construct(string $name, array $params){
-    
         $this->name = $name;
         $this->params = $params;
 
         $this->device = $params['Description'] ?? null;
         $this->ipv4 = isset($params['IPv4 Address']) ? str_replace(['%5','(Preferred)'], '', $params['IPv4 Address']) : null;
-        $this->ipv6 = str_replace(['%5','(Preferred)'], '', ($params['IPv6 Address'] ?? $params['Link-local IPv6 Address'] ?? null));
+        $this->ipv6 = explode('%', str_replace(['(Preferred)'], '', ($params['IPv6 Address'] ?? $params['Link-local IPv6 Address'] ?? null)))[0];
 
-        $this->mac = $params['Physical Address'] ?? null;
-
+        $this->mac = str_replace('-', ':', $params['Physical Address'] ?? null);
     }
     
     /**

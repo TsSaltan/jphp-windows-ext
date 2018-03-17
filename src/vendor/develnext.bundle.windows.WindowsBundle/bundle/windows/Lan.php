@@ -24,7 +24,8 @@ class Lan
         $adaptersObj = [];
         $adapterName = false;
 
-        $cmd = WSH::cmd('ipconfig /all');
+        // ipconfig возвращает в 866, независимо от указанной кодировки
+        $cmd = WSH::cmd('ipconfig /all', [], 'utf-8', 'cp866');  
         $nic = WSH::WMIC('nic get');
 
         $scanner = (new Scanner($cmd))->useDelimiter(Regex::of('\n', Regex::MULTILINE));

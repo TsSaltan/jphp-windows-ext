@@ -40,16 +40,17 @@ class WindowsScriptHost
      * @param string $command
      * @param array $params=array() параметры для замены (в запросе можно передать именованные параметры, как в PDO)
      * @param string $charset кодировка ответа (в командной строке по умолчанию cp866). utf-8 возвращает всё на английском языке
+     * @param string $decodeCharset кодировка, из которой будет декодироваться ответ. Некоторые команды (например ipconfig), возвращают в cp866, даже если перед ней явно указан вывод командой chcp
      * @return string
      * @throws WindowsException
      */  
-    public static function cmd($command, $params = [], $charset = 'utf-8'){
+    public static function cmd($command, $params = [], $charset = 'utf-8', $decodeCharset = 'auto'){
         if($charset == 'utf-8') $chcp = 65001;
         else $chcp = str_replace(['cp', 'windows', '-'], '', $charset);
         
         $command = Windows::getSystem32('chcp.com') . ' ' . $chcp . '>nul & ' . $command;
         $command = Prepare::Query($command, $params);    
-        return self::Exec([Windows::getSystem32('cmd.exe'), '/c', $command], true, $charset);  
+        return self::Exec([Windows::getSystem32('cmd.exe'), '/c', $command], true, ($decodeCharset == 'auto' ? $charset : $decodeCharset));
     }
     
     /**
