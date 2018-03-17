@@ -1358,7 +1358,29 @@ PS;
             Write-Host \$productkey
 PS;
 
-var_dump($psCommand);
         return WSH::PowerShell($psCommand, [], true, true);
+    }
+
+    /**
+     * Возвращает номер версии ОС
+     * @return int
+     */
+    public static function getProductVersion() : int {
+        try{    
+            $release = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('ReleaseId')->value;
+        } catch (WindowsException $e){
+            $release = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('CSDBuildNumber')->value;
+        }
+
+        return intval($release);
+    }
+
+    /**
+     * Возвращает номер сборки ОС
+     * @return int
+     */
+    public static function getProductBuild() : int {
+        $build = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('CurrentBuild')->value;
+        return intval($build);
     }
 }
