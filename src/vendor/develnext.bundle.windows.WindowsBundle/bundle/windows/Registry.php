@@ -6,6 +6,7 @@ use bundle\windows\result\registryItem;
 use php\lib\arr;
 use php\lib\str;
 use php\util\Regex;
+use bundle\windows\Windows;
 use bundle\windows\WindowsScriptHost as WSH;
 
 /**
@@ -85,7 +86,7 @@ class Registry
      */
     
     public function readFully($recursive = false){
-        $exec = WSH::cmd('reg query ":path"' . ($recursive ? ' /s' : ''), ['path' => $this->path]);
+        $exec = $this->query('query ":path"' . ($recursive ? ' /s' : ''), ['path' => $this->path]);
         return $this->parseAnswer($exec);
     }
     
@@ -96,7 +97,7 @@ class Registry
      * @return registryItem
      */
     public function read($key){
-        $exec = WSH::cmd('reg query ":path" /v ":key"', ['path' => $this->path, 'key' => $key]);
+        $exec = $this->query('query ":path" /v ":key"', ['path' => $this->path, 'key' => $key]);
         $result = $this->parseAnswer($exec);
         return isset($result[0]) ? $result[0]->next() : null;
     }
@@ -109,7 +110,7 @@ class Registry
      * @param string $type Тип переменной (REG_SZ|REG_DWORD|REG_BINARY)
      */
     public function add($key, $value, $type = 'REG_SZ'){   
-        return WSH::cmd('reg add ":path" /v ":key" /t ":type" /d ":value" /f', [
+        return $this->query('add ":path" /v ":key" /t ":type" /d ":value" /f', [
             'path' => $this->path, 
             'key' => $key, 
             'value' => $value, 
@@ -123,7 +124,7 @@ class Registry
      * Создать раздел реестра
      */
     public function create(){   
-        return WSH::cmd('reg add ":path" /f', ['path' => $this->path]);
+        return $this->query('add ":path" /f', ['path' => $this->path]);
     }
 
     /**
@@ -131,7 +132,7 @@ class Registry
      * Удалить раздел реестра
      */
     public function delete(){   
-        return WSH::cmd('reg delete ":path" /f', ['path' => $this->path]);
+        return $this->query('delete ":path" /f', ['path' => $this->path]);
     }
 
     /**
@@ -139,7 +140,7 @@ class Registry
      * Удалить содержимое раздела
      */
     public function clear(){   
-        return WSH::cmd('reg delete ":path" /va /f', ['path' => $this->path]);
+        return $this->query('delete ":path" /va /f', ['path' => $this->path]);
     }
 
     /**
@@ -148,7 +149,7 @@ class Registry
      * @param string $key
      */
     public function deleteKey($key){   
-        return WSH::cmd('reg delete ":path" /v ":key" /f', ['path' => $this->path, 'key' => $key]);
+        return $this->query('delete ":path" /v ":key" /f', ['path' => $this->path, 'key' => $key]);
     }
 
     /**
@@ -160,7 +161,7 @@ class Registry
      * @return registryResult[]
      */
     public function search($search, $recursive = false, $fullEqual = false){
-        $exec = WSH::cmd('reg query ":path" /f ":search"' . ($fullEqual ? ' /e' : '') . ($recursive ? ' /s' : ''), ['path' => $this->path, 'search' => $search]);
+        $exec = $this->query('query ":path" /f ":search"' . ($fullEqual ? ' /e' : '') . ($recursive ? ' /s' : ''), ['path' => $this->path, 'search' => $search]);
         return $this->parseAnswer($exec);
     }
 
@@ -173,7 +174,7 @@ class Registry
      * @return registryResult[]
      */
     public function searchValue($search, $recursive = false, $fullEqual = false){
-        $exec = WSH::cmd('reg query ":path" /f ":search" /d' . ($fullEqual ? ' /e' : '') . ($recursive ? ' /s' : ''), ['path' => $this->path, 'search' => $search]);
+        $exec = $this->query('query ":path" /f ":search" /d' . ($fullEqual ? ' /e' : '') . ($recursive ? ' /s' : ''), ['path' => $this->path, 'search' => $search]);
         return $this->parseAnswer($exec);
     }
 
@@ -198,5 +199,9 @@ class Registry
         return $return;
     }
     
+    private function query(string $command, array $vars = []){
+        $regPath = Windows::getSysNative('reg.exe');
+        return WSH::cmd($regPath . ' ' . $command, $vars);        
+    }
     
 }
