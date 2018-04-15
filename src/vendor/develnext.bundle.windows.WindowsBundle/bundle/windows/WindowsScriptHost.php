@@ -93,12 +93,8 @@ class WindowsScriptHost
         $query = "[Console]::OutputEncoding = [System.Text.Encoding]::UTF8\n" . $query;
         $source = Prepare::Query($query, $params);
         $command = 'Invoke-Expression ([System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String(\'' . base64_encode($source) . '\')))'; 
-
-        return self::Exec([self::getPSPath(), '-inputformat', 'none', '-command', $command], $wait, 'utf-8');  
-    }
-
-    protected static function getPSPath() : string {
-        return Windows::getSysNative('WindowsPowerShell\\v1.0\\powershell.exe');   
+        $psPath = Windows::getSysNative('WindowsPowerShell\\v1.0\\powershell.exe');
+        return self::Exec([$psPath, '-inputformat', 'none', '-command', $command], $wait, 'utf-8');  
     }
     
     /**
@@ -108,6 +104,7 @@ class WindowsScriptHost
      * @param string $params
      * @return string
      * @throws WindowsException
+     * @deprecated
      */
     public static function vbScript($query, $params = []){
         $command = Prepare::Query($query, $params); 

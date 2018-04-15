@@ -18,6 +18,15 @@ use php\time\TimeFormat;
 use php\time\Timer;
 use php\util\Regex;
 
+
+if(!defined('JAVA_HOME')){
+    define('JAVA_HOME', realpath(System::getProperty('java.home') . '/bin'));
+}
+
+if(!defined('CURRENT_DIRECTORY')){
+    define('CURRENT_DIRECTORY', dirname(realpath(str::split(System::getProperty("java.class.path"), System::getProperty("path.separator"))[0])));
+}
+
 /**
  * @packages windows
  */
@@ -80,16 +89,32 @@ class Windows
     /**
      * Запустить процесс от имени администратора
      * @param string $file
-     * @param mixed $args Строка с аргументами через пробел или массив аргументов
-     * @param string $dir
+     * @param array $args
+     * @param string $workDir
      */
-    public static function runAsAdmin($file, $args = [], $dir = NULL){
-        $args = is_array($args) ? implode(' ', $args) : $args;
-        return WSH::VBScript('CreateObject("Shell.Application").ShellExecute(":file", ":args", ":dir", "runas", 1)', [
-                'file' => $file,
-                'args' => $args,
-                'dir' => $dir
+    public static function runAsAdmin(string $file, array $args = [], string $workDir = null){
+        if(!fs::exists($file)){
+            throw new WindowsException("Invalid path '".$file."'");    
+        }
+
+        foreach ($args as $k => $arg) {
+            if(str::contains($arg, ' ')){
+                $args[$k] = '"' . $arg . '"';
+            }
+            $args[$k] = str_replace('"', '""', $args[$k]);
+        }
+        $argString = implode(' ', $args);
+        var_dump(['arguments' => $argString]);
+
+        $workDir = is_null($workDir) ? CURRENT_DIRECTORY : $workDir;
+        var_dump(['workDir' => $workDir]);
+
+        return WSH::PowerShell('Start-Process ":file" -WorkingDirectory ":dir" -Verb runAs -ArgumentList ":args"',[
+            'file' => $file,
+            'dir' => $workDir,
+            'args' => $argString
         ]);
+        
     }
 
     /**
@@ -114,8 +139,7 @@ class Windows
             break;
 
             case 'jar':
-                // если не установлена java и не прописан java_home, может быть ошибка
-                $cmd = 'javaw.exe'; // javaw запускает jar без консоли
+                $cmd = JAVA_HOME . '/javaw.exe'; // javaw запускает jar без консоли
                 $params = array_merge(['-jar'], $argv);
             break;
 
@@ -645,6 +669,7 @@ class Windows
      * --RU--
      * Проговорить текст
      * @param string $text Текст
+     * @deprecated
      */
     public static function speak($text){
         return WSH::vbScript('CreateObject("SAPI.SpVoice").Speak(":text")', ['text' => $text]);
