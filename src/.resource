@@ -6,4 +6,4 @@ icon=develnext/bundle/windows/windows32.png
 
 class=develnext\\bundle\\windows\\WindowsBundle
 author=Ts.Saltan
-version=2.1.0.4-dev
+version=2.1.0.5-dev
