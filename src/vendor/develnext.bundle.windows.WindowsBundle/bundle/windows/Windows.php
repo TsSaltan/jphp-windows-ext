@@ -8,16 +8,17 @@ use bundle\windows\Task;
 use Exception;
 use php\gui\UXApplication;
 use php\gui\UXImage;
+use php\io\IOException;
 use php\io\File;
 use php\io\MiscStream;
 use php\lang\System;
 use php\lib\fs;
 use php\lib\str;
+use php\net\Socket;
 use php\time\Time;
 use php\time\TimeFormat;
 use php\time\Timer;
 use php\util\Regex;
-
 
 if(!defined('JAVA_HOME')){
     define('JAVA_HOME', realpath(System::getProperty('java.home') . '/bin'));
@@ -976,7 +977,14 @@ PS;
      * @return bool
      */
     public static function isInternetAvaliable() : bool {
-        return self::ping('google.com', 1)['avg'] > 0;
+        try {
+            $socket = new Socket;
+            $socket->connect('google.com', '80', 1000);
+            $socket->close();
+            return true;
+        } catch (Exception | IOException $e) {
+            return false;
+        }
     }
 
     /**
