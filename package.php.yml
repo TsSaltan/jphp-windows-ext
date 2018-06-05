@@ -1,0 +1,13 @@
+name: dn-windows-bundle
+version: 2.1.0.5-dev
+description: WindowsBundle
+
+plugins:
+- Doc
+
+doc:
+  stub-dirs: ['./src/']
+  langs: {en: English, ru: Русский}
+
+config:
+  ignore: ['/api-docs/**']
