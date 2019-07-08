@@ -1,11 +1,17 @@
-**[Home](https://tssaltan.ru/1156.develnext-windows/#wiki)**
+**[Home](https://tssaltan.top/1156.develnext-windows/#wiki)**
 
 **[Wiki](https://github.com/TsSaltan/DevelNext-Windows/wiki/)**
 
-**[Тема на форуме](http://community.develstudio.org/showthread.php/13689-Модуль-для-работы-с-ОС-Windows)**
 
 ## Changelog
 ```
+--- 2.1 ---
+[Add] Windows::reboot()
+[Add] Windows::shutdown()
+[Add] Windows::pressKey()
+[Add] Windows::getKeyboardLayoutName()
+[Add] Windows::getKeyboardLayout()
+
 --- 1.3 ---
 [Add] Windows::runAsAdmin()
 [Add] Windows::requireAdmin()
