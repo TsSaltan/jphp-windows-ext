@@ -607,7 +607,7 @@ class Windows
      */
     public static function getBatteryPercent(){
         try{
-            return ++(WSH::WMIC('Path Win32_Battery Get EstimatedChargeRemaining')[0]['EstimatedChargeRemaining']);
+            return (WSH::WMIC('Path Win32_Battery Get EstimatedChargeRemaining')[0]['EstimatedChargeRemaining'])+1;
         } catch (\Exception $e){
             throw new WindowsException('Battery does not support');
         }
@@ -1415,5 +1415,36 @@ PS;
     public static function getProductBuild() : int {
         $build = Registry::of('HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion')->read('CurrentBuild')->value;
         return intval($build);
+    }
+
+    /**
+     * Некоторые коды кнопок
+     */
+    const VK_VOLUME_MUTE = 0xAD;
+    const VK_VOLUME_DOWN = 0xAE;
+    const VK_VOLUME_UP = 0xAF;
+    const VK_MEDIA_NEXT_TRACK = 0xB0;
+    const VK_MEDIA_PREV_TRACK = 0xB1;
+    const VK_MEDIA_STOP = 0xB2;
+    const VK_MEDIA_PLAY_PAUSE = 0xB3;
+
+    /**
+     * Имитирует нажатие на кнопку
+     * @link https://docs.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
+     * @param int $keyCode Код кнопки
+     * @example Windows::pressKey(0xB3); // Press media play/pause button
+     */
+    public static function pressKey(int $keyCode){
+        $c = new CSharp('
+            using System;
+            using System.Runtime.InteropServices;
+
+            public class Media {
+                [DllImport("User32.dll",CharSet=CharSet.Unicode)]
+                public static extern void keybd_event(byte virtualKey, byte scanCode, uint flags, IntPtr extraInfo);
+            }    
+        ');
+
+        return $c->call('Media', 'keybd_event', [$keyCode, 0, 1, 0]);
     }
 }
