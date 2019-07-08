@@ -1447,4 +1447,18 @@ PS;
 
         return $c->call('Media', 'keybd_event', [$keyCode, 0, 1, 0]);
     }
+
+    /**
+     * Выключить ПК
+     */
+    public static function shutdown(){
+        return WSH::cmd('shutdown /s /f /t 0');
+    }
+
+    /**
+     * Перезагрузить ПК
+     */
+    public static function reboot(){
+        return WSH::cmd('shutdown -r -t 0');
+    }
 }
