@@ -1,18 +1,13 @@
-/build/
-/bundle/
-/.idea
-/.gradle/
-/gradle/
+build/
+bundle/
+.idea
+.gradle/
+gradle/
 
-/*.iml
+*.gradle
+/gradlew/
+gradlew.*
 
-/test-project/*
-
-/*.log
-/*.pid
-/*.tmp
-/*.sourcemap
-/*.gradle
-/gradlew
-/gradlew.*
-/gradlew.bat
+*.phpintel
+package.hub.yml
+package-lock.php.yml
