@@ -1,7 +1,7 @@
 # startupItem
 
 - **class** `startupItem` (`bundle\windows\result\startupItem`) **extends** [`abstractItem`](classes/bundle/windows/result/abstractItem.md)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/startupItem.php`
+- **source** `bundle/windows/result/startupItem.php`
 
 ---
 

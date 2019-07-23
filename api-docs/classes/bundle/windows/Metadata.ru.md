@@ -2,7 +2,7 @@
 
 - **класс** `Metadata` (`bundle\windows\Metadata`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Metadata.php`
+- **исходники** `bundle/windows/Metadata.php`
 
 ---
 

@@ -2,7 +2,7 @@
 
 - **класс** `COM` (`bundle\windows\COM`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/COM.php`
+- **исходники** `bundle/windows/COM.php`
 
 **Описание**
 

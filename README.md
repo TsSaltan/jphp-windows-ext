@@ -1,10 +1,17 @@
-**[Home](https://tssaltan.top/1156.develnext-windows/#wiki)**
+[
+![logo](https://tssaltan.top/files/2016/10/windows-bundle.png)
+](https://tssaltan.top/1156.develnext-windows)
 
-**[Wiki](https://github.com/TsSaltan/DevelNext-Windows/wiki/)**
-
+- [**JPPM api-docs**](api-docs/README.md)
+- [**Wiki**](https://github.com/TsSaltan/jphp-windows-ext/wiki/)
+- [**Пакет расширений для DevelNext**](https://github.com/TsSaltan/jphp-windows-ext/releases)
 
 ## Changelog
 ```
+--- 2.1.1 ---
+[Add] Windows::getSystemDrive()
+Migrate to jppm
+
 --- 2.1 ---
 [Add] Windows::reboot()
 [Add] Windows::shutdown()
@@ -80,8 +87,7 @@
 [Fix] Windows::getMAC();
 ```
 
-
-## Build
+## Build bundle
 ```
-gradlew bundle
+jppm bundle:build
 ```

@@ -1,7 +1,7 @@
 # registryItem
 
 - **класс** `registryItem` (`bundle\windows\result\registryItem`) **унаследован от** [`abstractItem`](classes/bundle/windows/result/abstractItem.ru.md)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/registryItem.php`
+- **исходники** `bundle/windows/result/registryItem.php`
 
 ---
 

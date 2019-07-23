@@ -1,7 +1,7 @@
 # comItem
 
 - **класс** `comItem` (`bundle\windows\result\comItem`) **унаследован от** [`abstractItem`](classes/bundle/windows/result/abstractItem.ru.md)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/comItem.php`
+- **исходники** `bundle/windows/result/comItem.php`
 
 ---
 

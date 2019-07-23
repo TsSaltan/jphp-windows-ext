@@ -1,7 +1,7 @@
 # taskResult
 
 - **класс** `taskResult` (`bundle\windows\result\taskResult`) **унаследован от** [`abstractResult`](classes/bundle/windows/result/abstractResult.ru.md)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/taskResult.php`
+- **исходники** `bundle/windows/result/taskResult.php`
 
 **Описание**
 

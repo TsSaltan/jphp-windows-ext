@@ -2,7 +2,7 @@
 
 - **class** `Startup` (`bundle\windows\Startup`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Startup.php`
+- **source** `bundle/windows/Startup.php`
 
 **Description**
 

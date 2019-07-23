@@ -1,7 +1,7 @@
 # registryItem
 
 - **class** `registryItem` (`bundle\windows\result\registryItem`) **extends** [`abstractItem`](classes/bundle/windows/result/abstractItem.md)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/registryItem.php`
+- **source** `bundle/windows/result/registryItem.php`
 
 ---
 

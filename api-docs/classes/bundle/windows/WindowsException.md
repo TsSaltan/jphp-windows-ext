@@ -2,7 +2,7 @@
 
 - **class** `WindowsException` (`bundle\windows\WindowsException`) **extends** `Exception` (`Exception`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/WindowsException.php`
+- **source** `bundle/windows/WindowsException.php`
 
 **Description**
 

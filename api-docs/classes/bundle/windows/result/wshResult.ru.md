@@ -1,7 +1,7 @@
 # wshResult
 
 - **класс** `wshResult` (`bundle\windows\result\wshResult`)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/wshResult.php`
+- **исходники** `bundle/windows/result/wshResult.php`
 
 ---
 

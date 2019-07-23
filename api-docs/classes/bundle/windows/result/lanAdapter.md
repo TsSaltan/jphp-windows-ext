@@ -1,7 +1,7 @@
 # lanAdapter
 
 - **class** `lanAdapter` (`bundle\windows\result\lanAdapter`)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/lanAdapter.php`
+- **source** `bundle/windows/result/lanAdapter.php`
 
 ---
 

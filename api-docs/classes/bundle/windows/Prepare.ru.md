@@ -1,7 +1,7 @@
 # Prepare
 
 - **класс** `Prepare` (`bundle\windows\Prepare`)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Prepare.php`
+- **исходники** `bundle/windows/Prepare.php`
 
 **Описание**
 

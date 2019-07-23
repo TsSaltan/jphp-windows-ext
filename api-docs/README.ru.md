@@ -2,27 +2,18 @@
 
 ---
 
-## dn-windows-bundle
-> версия 2.1.0.5-dev, создано с помощью JPPM.
+## windows
+> версия 2.1.1, создано с помощью JPPM.
 
-WindowsBundle
+Пакет для взаимодействия с API Windows
 
 ### Установка
 ```
-jppm add dn-windows-bundle@2.1.0.5-dev
+jppm add windows@https://github.com/TsSaltan/jphp-windows-ext
 ```
 
 ### АПИ
 **Классы**
-
-#### `develnext\bundle\windows`
-
-- [`WindowsBundle`](classes/develnext/bundle/windows/WindowsBundle.ru.md)- _Class WindowsBundle_
-
-#### `bundle\windows\api`
-
-- [`CSharp`](classes/bundle/windows/api/CSharp.ru.md)- _Класс для выполнения C# кода_
-- [`Dll`](classes/bundle/windows/api/Dll.ru.md)
 
 #### `bundle\windows`
 

@@ -2,7 +2,7 @@
 
 - **class** `Task` (`bundle\windows\Task`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Task.php`
+- **source** `bundle/windows/Task.php`
 
 ---
 
@@ -15,7 +15,6 @@
 - `Task ::`[`exists()`](#method-exists) - _Существует ли процесс с таким именем образа_
 - `Task ::`[`pidExists()`](#method-pidexists) - _Существует ли процесс с таким PID_
 - `Task ::`[`titleExists()`](#method-titleexists) - _Существует ли процесс с таким заголовком окна_
-- `Task ::`[`getForegroundWindow()`](#method-getforegroundwindow)
 - `Task ::`[`exec()`](#method-exec)
 - `Task ::`[`parseAnswer()`](#method-parseanswer)
 
@@ -89,15 +88,6 @@ Task::pidExists(int $pid): bool
 Task::titleExists(string $title): bool
 ```
 Существует ли процесс с таким заголовком окна
-
----
-
-<a name="method-getforegroundwindow"></a>
-
-### getForegroundWindow()
-```php
-Task::getForegroundWindow(): void
-```
 
 ---
 

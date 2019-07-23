@@ -2,7 +2,7 @@
 
 - **class** `Metadata` (`bundle\windows\Metadata`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Metadata.php`
+- **source** `bundle/windows/Metadata.php`
 
 ---
 

@@ -1,7 +1,7 @@
 # Prepare
 
 - **class** `Prepare` (`bundle\windows\Prepare`)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Prepare.php`
+- **source** `bundle/windows/Prepare.php`
 
 **Description**
 

@@ -2,7 +2,7 @@
 
 - **класс** `Lan` (`bundle\windows\Lan`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Lan.php`
+- **исходники** `bundle/windows/Lan.php`
 
 **Описание**
 

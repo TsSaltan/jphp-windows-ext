@@ -2,7 +2,7 @@
 
 - **класс** `WindowsException` (`bundle\windows\WindowsException`) **унаследован от** `Exception` (`Exception`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/WindowsException.php`
+- **исходники** `bundle/windows/WindowsException.php`
 
 **Описание**
 

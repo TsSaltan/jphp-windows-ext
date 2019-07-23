@@ -1,7 +1,7 @@
 # abstractItem
 
 - **class** `abstractItem` (`bundle\windows\result\abstractItem`)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/abstractItem.php`
+- **source** `bundle/windows/result/abstractItem.php`
 
 **Child Classes**
 

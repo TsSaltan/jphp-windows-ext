@@ -1,7 +1,7 @@
 # registryResult
 
 - **класс** `registryResult` (`bundle\windows\result\registryResult`) **унаследован от** [`abstractResult`](classes/bundle/windows/result/abstractResult.ru.md)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/registryResult.php`
+- **исходники** `bundle/windows/result/registryResult.php`
 
 ---
 

@@ -2,7 +2,7 @@
 
 - **класс** `Wlan` (`bundle\windows\Wlan`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Wlan.php`
+- **исходники** `bundle/windows/Wlan.php`
 
 **Описание**
 

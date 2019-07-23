@@ -1,7 +1,7 @@
 # abstractResult
 
 - **class** `abstractResult` (`bundle\windows\result\abstractResult`)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/abstractResult.php`
+- **source** `bundle/windows/result/abstractResult.php`
 
 **Child Classes**
 

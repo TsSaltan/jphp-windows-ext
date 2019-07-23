@@ -1,7 +1,7 @@
 # startupItem
 
 - **класс** `startupItem` (`bundle\windows\result\startupItem`) **унаследован от** [`abstractItem`](classes/bundle/windows/result/abstractItem.ru.md)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/startupItem.php`
+- **исходники** `bundle/windows/result/startupItem.php`
 
 ---
 

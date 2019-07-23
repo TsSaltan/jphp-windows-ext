@@ -2,7 +2,7 @@
 
 - **класс** `Registry` (`bundle\windows\Registry`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Registry.php`
+- **исходники** `bundle/windows/Registry.php`
 
 **Описание**
 

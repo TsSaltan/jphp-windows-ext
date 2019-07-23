@@ -1,7 +1,7 @@
 # wlanInterface
 
 - **класс** `wlanInterface` (`bundle\windows\result\wlanInterface`)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/wlanInterface.php`
+- **исходники** `bundle/windows/result/wlanInterface.php`
 
 ---
 

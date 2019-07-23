@@ -1,7 +1,7 @@
 # registryResult
 
 - **class** `registryResult` (`bundle\windows\result\registryResult`) **extends** [`abstractResult`](classes/bundle/windows/result/abstractResult.md)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/registryResult.php`
+- **source** `bundle/windows/result/registryResult.php`
 
 ---
 

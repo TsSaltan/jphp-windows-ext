@@ -2,7 +2,7 @@
 
 - **class** `Windows` (`bundle\windows\Windows`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Windows.php`
+- **source** `bundle/windows/Windows.php`
 
 ---
 
@@ -75,6 +75,7 @@
 - `Windows ::`[`setWallpaper()`](#method-setwallpaper) - _Установить обои_
 - `Windows ::`[`updateDesktopWallpaper()`](#method-updatedesktopwallpaper) - _Визуальное обновление обоев на рабочем столе_
 - `Windows ::`[`getSystem32()`](#method-getsystem32) - _Путь к системной папке windows\system32_
+- `Windows ::`[`getSystemDrive()`](#method-getsystemdrive) - _Возвращает букву системного диска_
 - `Windows ::`[`getSysNative()`](#method-getsysnative) - _Если 32-битный процесс запущен в 64-битной системе, то он не может_
 - `Windows ::`[`ping()`](#method-ping) - _Ping_
 - `Windows ::`[`isInternetAvaliable()`](#method-isinternetavaliable) - _Проверить наличие Интернет-соединения_
@@ -83,6 +84,9 @@
 - `Windows ::`[`getProductKey()`](#method-getproductkey) - _Возвращает ProductKey системы_
 - `Windows ::`[`getProductVersion()`](#method-getproductversion) - _Возвращает номер версии ОС_
 - `Windows ::`[`getProductBuild()`](#method-getproductbuild) - _Возвращает номер сборки ОС_
+- `Windows ::`[`pressKey()`](#method-presskey) - _Имитирует нажатие на кнопку_
+- `Windows ::`[`shutdown()`](#method-shutdown) - _Выключить ПК_
+- `Windows ::`[`reboot()`](#method-reboot) - _Перезагрузить ПК_
 
 ---
 # Static Methods
@@ -697,6 +701,16 @@ Windows::getSystem32(mixed $path): string
 
 ---
 
+<a name="method-getsystemdrive"></a>
+
+### getSystemDrive()
+```php
+Windows::getSystemDrive(): string
+```
+Возвращает букву системного диска
+
+---
+
 <a name="method-getsysnative"></a>
 
 ### getSysNative()
@@ -776,3 +790,33 @@ Windows::getProductVersion(): int
 Windows::getProductBuild(): int
 ```
 Возвращает номер сборки ОС
+
+---
+
+<a name="method-presskey"></a>
+
+### pressKey()
+```php
+Windows::pressKey(int $keyCode): void
+```
+Имитирует нажатие на кнопку
+
+---
+
+<a name="method-shutdown"></a>
+
+### shutdown()
+```php
+Windows::shutdown(): void
+```
+Выключить ПК
+
+---
+
+<a name="method-reboot"></a>
+
+### reboot()
+```php
+Windows::reboot(): void
+```
+Перезагрузить ПК

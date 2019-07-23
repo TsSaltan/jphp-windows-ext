@@ -1,7 +1,7 @@
 # abstractItem
 
 - **класс** `abstractItem` (`bundle\windows\result\abstractItem`)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/abstractItem.php`
+- **исходники** `bundle/windows/result/abstractItem.php`
 
 **Классы наследники**
 

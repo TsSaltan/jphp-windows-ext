@@ -1,7 +1,7 @@
 # comItem
 
 - **class** `comItem` (`bundle\windows\result\comItem`) **extends** [`abstractItem`](classes/bundle/windows/result/abstractItem.md)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/comItem.php`
+- **source** `bundle/windows/result/comItem.php`
 
 ---
 

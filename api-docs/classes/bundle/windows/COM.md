@@ -2,7 +2,7 @@
 
 - **class** `COM` (`bundle\windows\COM`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/COM.php`
+- **source** `bundle/windows/COM.php`
 
 **Description**
 

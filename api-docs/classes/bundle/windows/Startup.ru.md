@@ -2,7 +2,7 @@
 
 - **класс** `Startup` (`bundle\windows\Startup`)
 - **пакет** `windows`
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Startup.php`
+- **исходники** `bundle/windows/Startup.php`
 
 **Описание**
 

@@ -1,7 +1,7 @@
 # abstractResult
 
 - **класс** `abstractResult` (`bundle\windows\result\abstractResult`)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/abstractResult.php`
+- **исходники** `bundle/windows/result/abstractResult.php`
 
 **Классы наследники**
 

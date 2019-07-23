@@ -1,7 +1,7 @@
 # taskItem
 
 - **класс** `taskItem` (`bundle\windows\result\taskItem`) **унаследован от** [`abstractItem`](classes/bundle/windows/result/abstractItem.ru.md)
-- **исходники** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/taskItem.php`
+- **исходники** `bundle/windows/result/taskItem.php`
 
 **Описание**
 

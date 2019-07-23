@@ -1,7 +1,7 @@
 # taskItem
 
 - **class** `taskItem` (`bundle\windows\result\taskItem`) **extends** [`abstractItem`](classes/bundle/windows/result/abstractItem.md)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/taskItem.php`
+- **source** `bundle/windows/result/taskItem.php`
 
 **Description**
 

@@ -9,5 +9,7 @@ gradle/
 gradlew.*
 
 *.phpintel
+
 package.hub.yml
 package-lock.php.yml
+vendor/*

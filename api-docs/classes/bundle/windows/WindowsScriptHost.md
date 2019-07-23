@@ -2,7 +2,7 @@
 
 - **class** `WindowsScriptHost` (`bundle\windows\WindowsScriptHost`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/WindowsScriptHost.php`
+- **source** `bundle/windows/WindowsScriptHost.php`
 
 **Description**
 
@@ -13,7 +13,6 @@
 #### Static Methods
 
 - `WindowsScriptHost ::`[`exec()`](#method-exec)
-- `WindowsScriptHost ::`[`makeProcess()`](#method-makeprocess)
 - `WindowsScriptHost ::`[`cmd()`](#method-cmd) - _Выполнить команду_
 - `WindowsScriptHost ::`[`WMIC()`](#method-wmic) - _Сделать запрос к WMI_
 - `WindowsScriptHost ::`[`PowerShell()`](#method-powershell) - _Выполнить скрипт PowerShell_
@@ -27,15 +26,6 @@
 ### exec()
 ```php
 WindowsScriptHost::exec(mixed $cmd, mixed $wait, mixed $charset): void
-```
-
----
-
-<a name="method-makeprocess"></a>
-
-### makeProcess()
-```php
-WindowsScriptHost::makeProcess(array $cmd): bundle\windows\result\wshResult
 ```
 
 ---

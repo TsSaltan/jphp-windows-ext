@@ -2,7 +2,7 @@
 
 - **class** `Wlan` (`bundle\windows\Wlan`)
 - **package** `windows`
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/Wlan.php`
+- **source** `bundle/windows/Wlan.php`
 
 **Description**
 

@@ -1,7 +1,7 @@
 # taskResult
 
 - **class** `taskResult` (`bundle\windows\result\taskResult`) **extends** [`abstractResult`](classes/bundle/windows/result/abstractResult.md)
-- **source** `vendor/develnext.bundle.windows.WindowsBundle/bundle/windows/result/taskResult.php`
+- **source** `bundle/windows/result/taskResult.php`
 
 **Description**
 
