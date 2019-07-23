@@ -7,7 +7,7 @@ plugins:
   - Doc
 
 sources:
-  - /src/
+  - src
 
 doc:
   stub-dirs: ['./src/']
