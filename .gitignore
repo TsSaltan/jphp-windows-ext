@@ -1,15 +1,13 @@
-build/
-bundle/
-.idea
-.gradle/
-gradle/
-gradlew
-gradlew.*
+/build/
+/bundle/
+/.idea
+/.gradle/
+/gradle/
+/gradlew
+/gradlew.*
 
+/*.phpintel
 
-*.phpintel
-
-package.hub.yml
-package-lock.php.yml
-vendor/*
-
+/package.hub.yml
+/package-lock.php.yml
+/vendor/*
