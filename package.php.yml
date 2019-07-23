@@ -1,0 +1,45 @@
+name: windows
+version: 2.1.1
+description: Пакет для взаимодействия с API Windows
+
+plugins:
+  - Hub
+  - Doc
+
+sources:
+  - /src/
+
+doc:
+  stub-dirs: ['./src/']
+  langs: {en: English, ru: Русский}
+
+devDeps:
+  dn-bundle-plugin: '*'
+
+config:
+  ignore:
+  - /*.iml
+  - /.git/**
+  - /package.hub.yml
+  - /.gitignore
+  - /gradle/**
+  - /**.phpintel
+  - /bundle/**
+  - /src-bundle/**
+  - /build/**
+  - /vendor/**
+  - /jars/**
+  - /src-jvm/**
+  - /.gitignore
+  - /**.gradle
+  - /gradlew
+  - /gradlew.**
+
+develnext-bundle:
+  version: 2.1.1
+  name: windows
+  description: Плагин для взаимодействия с API Windows
+  author: Ts.Saltan
+  icon: "develnext/bundle/windows/windows32.png"
+  group: "system"
+  class: "develnext\\bundle\\windows\\WindowsBundle"
