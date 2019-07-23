@@ -87,6 +87,11 @@ Migrate to jppm
 [Fix] Windows::getMAC();
 ```
 
+## Install package via jppm
+```
+jppm add windows@git+https://github.com/TsSaltan/jphp-windows-ext
+```
+
 ## Build bundle
 ```
 jppm bundle:build
