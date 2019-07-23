@@ -1,23 +1,18 @@
+/build/
+/bundle/
+/.idea
+/.gradle/
+/gradle/
 
-build/*/
-build/*
-.idea
-.gradle/
+/*.iml
 
-*.iml
+/test-project/*
 
-test-project/.dn
-
-test-project/vendor
-test-project/src_generated
-test-project/src/JPHP-INF
-test-project/src/.debug
-test-project/build
-test-project/build.xml
-test-project/build.gradle
-test-project/settings.gradle
-
-*.log
-*.pid
-*.tmp
-*.sourcemap
+/*.log
+/*.pid
+/*.tmp
+/*.sourcemap
+/*.gradle
+/gradlew
+/gradlew.*
+/gradlew.bat
