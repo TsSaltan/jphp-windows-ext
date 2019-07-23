@@ -911,7 +911,16 @@ PS;
      * @return string
      */
     public static function getSystem32($path) : string {
-        return 'C:\\Windows\\System32\\' . $path;
+        return self::getSystemDrive() . ':\\Windows\\System32\\' . $path;
+    }   
+
+    /**
+     * Возвращает букву системного диска 
+     * @return string
+     */
+    public static function getSystemDrive() : string {
+        $path = $_ENV['HOMEDRIVE'] ?? $_ENV['SystemRoot'] ?? 'C';
+        return str::sub($path, 0, 1);
     }    
 
     /**
@@ -924,9 +933,9 @@ PS;
      * @todo test on win7
      */
     public static function getSysNative($path) : string {
-        return fs::exists('C:\\Windows\\SysNative\\' . $path) 
-                ? ('C:\\Windows\\SysNative\\' . $path) 
-                : ('C:\\Windows\\System32\\' . $path);
+        return fs::exists(self::getSystemDrive() . ':\\Windows\\SysNative\\' . $path) 
+                ? (self::getSystemDrive() . ':\\Windows\\SysNative\\' . $path) 
+                : (self::getSystemDrive() . ':\\Windows\\System32\\' . $path);
     }
 
     /**
