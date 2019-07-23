@@ -3,13 +3,13 @@ bundle/
 .idea
 .gradle/
 gradle/
-
-*.gradle
-/gradlew/
+gradlew
 gradlew.*
+
 
 *.phpintel
 
 package.hub.yml
 package-lock.php.yml
 vendor/*
+
