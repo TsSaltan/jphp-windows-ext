@@ -430,7 +430,7 @@ class Windows
      * @todo add Win32_PrintJob 
      */
     public static function getPrinter(){
-        return WSH::WMIC('path Win32_Printer get')[0];
+        return WSH::WMIC('path Win32_Printer get');
     }
 
     /**
@@ -1469,5 +1469,24 @@ PS;
      */
     public static function reboot(){
         return WSH::cmd('shutdown -r -t 0');
+    }
+
+    /**
+     * Отправить файл на печать. Используется принтер по умолчанию. Необходимо наличие установленного пакета офиса.
+     * @param string $filepath Полный путь к файлу
+     */
+    public static function print(string $filepath){
+        return WSH::PowerShell('
+            $word = New-Object -ComObject Word.Application
+            $word.visible = $false
+            $word.Documents.Open(":file") > $null
+            $word.Application.ActiveDocument.printout()
+            $word.Application.ActiveDocument.Close()
+            $word.quit()
+        ', ['file' => $filepath]);
+    }
+
+    public static function getFileMeta(string $filepath){
+        return (new Metadata($filepath))->readData();
     }
 }
