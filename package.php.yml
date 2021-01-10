@@ -36,7 +36,7 @@ config:
   - /gradlew.**
 
 develnext-bundle:
-  version: 2.2
+  version: 2.3
   name: windows
   description: Плагин для взаимодействия с API Windows
   author: Ts.Saltan
