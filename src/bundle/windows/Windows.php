@@ -906,20 +906,39 @@ PS;
     }
 
     /**
-     * Путь к системной папке windows\system32
+     * Путь к файлу папке windows\system32
      *  
      * @return string
      */
     public static function getSystem32($path) : string {
-        return self::getSystemDrive() . ':\\Windows\\System32\\' . $path;
+        $path = self::getSystem32Path() . $path;
+        return fs::exists($path) ? $path : null;
+    }
+
+    /**
+     * Путь к системной папке windows\system32
+     *  
+     * @return string
+     */
+    public static function getSystem32path(): string {
+      return self::getWindowsPath() . '\\System32\\';
     }   
+
+    /**
+     * Путь к папке, где установлена Windows
+     * 
+     * @return string
+     */
+    public static function getWindowsPath() : string {
+      return $_ENV['WinDir'] ?? $_ENV['SystemRoot'] ?? 'C:\\Windows';
+    }
 
     /**
      * Возвращает букву системного диска 
      * @return string
      */
     public static function getSystemDrive() : string {
-        $path = $_ENV['HOMEDRIVE'] ?? $_ENV['SystemRoot'] ?? 'C';
+        $path = $_ENV['SystemDrive'] ?? $_ENV['SystemRoot'] ?? $_ENV['HOMEDRIVE'] ?? 'C';
         return str::sub($path, 0, 1);
     }    
 
@@ -933,9 +952,10 @@ PS;
      * @todo test on win7
      */
     public static function getSysNative($path) : string {
-        return fs::exists(self::getSystemDrive() . ':\\Windows\\SysNative\\' . $path) 
-                ? (self::getSystemDrive() . ':\\Windows\\SysNative\\' . $path) 
-                : (self::getSystemDrive() . ':\\Windows\\System32\\' . $path);
+        $windows = self::getWindowsPath();
+        return fs::exists("$windows\\SysNative\\$path") 
+                ? "$windows\\SysNative\\$path" 
+                : self::getSystem32Path();
     }
 
     /**
