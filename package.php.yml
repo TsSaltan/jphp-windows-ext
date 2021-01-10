@@ -1,5 +1,5 @@
 name: windows
-version: 2.2
+version: 2.3
 description: Пакет для взаимодействия с API Windows
 
 plugins:
