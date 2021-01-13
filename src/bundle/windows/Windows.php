@@ -955,7 +955,7 @@ PS;
         $windows = self::getWindowsPath();
         return fs::exists("$windows\\SysNative\\$path") 
                 ? "$windows\\SysNative\\$path" 
-                : self::getSystem32Path();
+                : self::getSystem32($path);
     }
 
     /**
