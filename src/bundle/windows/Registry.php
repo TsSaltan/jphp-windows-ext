@@ -89,17 +89,18 @@ class Registry
         $exec = $this->query('query ":path"' . ($recursive ? ' /s' : ''), ['path' => $this->path]);
         return $this->parseAnswer($exec);
     }
-    
+
     /**
      * --RU--
      * Чтение ключа
      * @param string $key имя ключа
-     * @return registryItem
+     * @return registryItem|null
      */
-    public function read($key){
+    public function read($key) {
         $exec = $this->query('query ":path" /v ":key"', ['path' => $this->path, 'key' => $key]);
-        $result = $this->parseAnswer($exec);
-        return isset($result[0]) ? $result[0]->next() : null;
+        $answer = $this->parseAnswer($exec);
+
+        return isset($answer[0]) ? $answer[0]->current() : null; // fix ->next() to ->current() for JPHP 1.0.3 (7.1.99)
     }
     
     /**
@@ -178,6 +179,12 @@ class Registry
         return $this->parseAnswer($exec);
     }
 
+    /**
+     * -- RU --
+     * Чтение результата выполнения запроса в реестр
+     * @param $answer Ответ запроса в реестр
+     * @return registryResult[]
+     */
     private function parseAnswer($answer){
         $parts = explode("\nHKEY_", $answer);      
         $return = [];
