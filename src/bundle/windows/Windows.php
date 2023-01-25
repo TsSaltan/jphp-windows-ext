@@ -110,12 +110,9 @@ class Windows
         $workDir = is_null($workDir) ? CURRENT_DIRECTORY : $workDir;
         var_dump(['workDir' => $workDir]);
 
-        return WSH::PowerShell('Start-Process ":file" -WorkingDirectory ":dir" -Verb runAs -ArgumentList ":args"',[
-            'file' => $file,
-            'dir' => $workDir,
-            'args' => $argString
-        ]);
-        
+        return WSH::PowerShell(empty($argString) ? 'Start-Process "'.$file.'" -WorkingDirectory "'.$workDir.'" -Verb runAs' :
+        'Start-Process "'.$file.'" -WorkingDirectory "'.$workDir.'" -Verb runAs -ArgumentList "'.$argString.'"');
+                               
     }
 
     /**
