@@ -74,7 +74,7 @@ class Lan
     public static function getActiveAdapter() : lanAdapter {
         $adapters = self::getAdapters();
         foreach ($adapters as $adapter) {
-            if($adapter->isActive()){
+            if($adapter->isConnected()){
                 return $adapter;
             }
         }
