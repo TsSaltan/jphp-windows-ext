@@ -8,6 +8,15 @@
 
 ## Changelog
 ```
+--- 2.3 ---
+[Fix] Windows::runAsAdmin() - Теперь нормально работает, если аргументов нет. Если их нет, для Start-Process не передается -ArgumentList
+[Fix] Windows::requireAdmin() - Нормально перезапускает программу, если ей не передано аргументов и она скомпилирована в .exe
+[Fix] Lan::getActiveAdapter() - Проверяет активен ли адаптер через isConnected(), а не несуществующий isActive(). Больше не вызывает исключения
+
+--- 2.2 ---
+[Add] Windows::print()
+[Add] Windows::getFileMeta()
+
 --- 2.1.1 ---
 [Add] Windows::getSystemDrive()
 Migrate to jppm
