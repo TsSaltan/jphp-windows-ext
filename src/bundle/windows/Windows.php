@@ -640,17 +640,23 @@ class Windows
 
     /**
      * --RU--
-     * Создать lnk-ярлык (ссылку на файл)
+     * Создать symlink (ярлык)
      * @param string $shortcut Расположение ярлыка
      * @param string $target Ссылка на файл
+     * @param string $iconpath=null Путь к ico файлу
+     * @param string $args=null Аргументы командной строки
      * @param string $description=null Описание
      */
-    public static function createShortcut($shortcut, $target, $description = null){
-        return WSH::PowerShell('$ws = New-Object -ComObject WScript.Shell; $s = $ws.CreateShortcut(\':shortcut\'); $S.TargetPath = \':target\'; $S.Description = \':description\'; $S.Save()', [
-            'shortcut' => str::replace($shortcut, "'", "\\'"),
-            'target' => str::replace($target, "'", "\\'"),
-            'description' => $description
-        ]);
+    public static function createShortcut($shortcut, $target, $iconpath = null, $args = null, $description = null){
+        $cmd = '$Wshell = New-Object -ComObject WScript.Shell; $shortcut = $Wshell.CreateShortcut("'.$shortcut.'"); $shortcut.TargetPath = "'.$target.'";';
+        if ($iconpath != null)
+            $cmd = $cmd.'$shortcut.IconLocation = "'.$iconpath.'";';
+        if ($args != null)
+            $cmd = $cmd.'$shortcut.Arguments = "'.$args.'";';
+        if ($description != null)
+            $cmd = $cmd.'$shortcut.Description = "'.$description.'";';
+        $cmd = $cmd.'$shortcut.save()';
+        return WSH::PowerShell($cmd);
     }
 
     /**

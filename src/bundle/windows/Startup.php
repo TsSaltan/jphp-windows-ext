@@ -133,14 +133,16 @@ class Startup
     /**
      * --RU--
      * Добавляет программу в автозагрузку
-     * @param string $file Команда для запуска
+     * @param string $file Файл для автозапуска
+     * @param string $iconpath=null Путь до иконки
+     * @param string $args=null Аргументы командной строки
      * @param string $description=null Описание
      * @return startupItem
      */
-    public static function add($file, $description = null) : startupItem {
+    public static function add($file, $iconpath = null, $args = null, $description = null) : startupItem {
         $dir = self::getUserStartupDirectory();
         $basename = basename($file);
-        Windows::createShortcut($dir . '\\' . $basename . '.lnk', $file, $description);
+        Windows::createShortcut($dir . '\\' . $basename . '.lnk', $file,$iconpath,$args,$description);
         return self::find($file);
     }
 
