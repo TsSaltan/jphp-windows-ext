@@ -152,7 +152,7 @@ class Startup
      * @param string $file Путь к исполняемому файлу
      * @return startupItem
      */
-    public static function find($file) : startupItem {
+    public static function find($file) {
         $list = self::getList();
         foreach($list as $item){
             if($item->file == $file){
