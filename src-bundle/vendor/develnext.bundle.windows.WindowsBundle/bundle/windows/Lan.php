@@ -34,7 +34,12 @@ class Lan
             $line = $scanner->current();
             
             $regAdapter = Regex::of('Ethernet adapter ([^\n\r]+):', Regex::MULTILINE)->with($line);
-            if($regAdapter->find()){
+            $isfind = $regAdapter->find();
+            
+            if (!($isfind)){
+                $regAdapter = Regex::of('Wireless LAN adapter ([^\n\r]+):', Regex::MULTILINE)->with($line);
+                $isfind = $regAdapter->find();}
+            if($isfind){
                 $adapterName = $regAdapter->group(1);
             } elseif($adapterName != false){
                 $regParam = Regex::of('\s+([^\.]+)[\.\s]+:([^\n]+)', Regex::MULTILINE)->with($line);
