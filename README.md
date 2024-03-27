@@ -8,6 +8,27 @@
 
 ## Changelog
 ```
+--- 2.6 ---
+[Change] Lan::getAdapters() - теперь выдаёт и Wlan адаптеры
+
+--- 2.5 ---
+[Fix] Lan::getActiveAdapter() - Больше не выдаёт как активные адаптеры виртуальных локальных сетей
+[Fix] Bundle для DevelNext снова корректно собирается
+
+--- 2.4 ---
+[Change] Windows::createShortcut() - Теперь поддерживает кастомный путь до иконки и аргументы командной строки
+[Change] Автором бандла поставил себя, т.к. TsSaltan явно забросил пакет
+[Change] Иконка Windows 7 заменена на Windows 11
+
+--- 2.3 ---
+[Fix] Windows::runAsAdmin() - Теперь нормально работает, если аргументов нет. Если их нет, для Start-Process не передается -ArgumentList
+[Fix] Windows::requireAdmin() - Нормально перезапускает программу, если ей не передано аргументов и она скомпилирована в .exe
+[Fix] Lan::getActiveAdapter() - Проверяет активен ли адаптер через isConnected(), а не несуществующий isActive(). Больше не вызывает исключения
+
+--- 2.2 ---
+[Add] Windows::print()
+[Add] Windows::getFileMeta()
+
 --- 2.1.1 ---
 [Add] Windows::getSystemDrive()
 Migrate to jppm

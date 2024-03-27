@@ -1,5 +1,5 @@
 name: windows
-version: 2.2
+version: 2.6
 description: Пакет для взаимодействия с API Windows
 
 plugins:
@@ -36,10 +36,10 @@ config:
   - /gradlew.**
 
 develnext-bundle:
-  version: 2.2
+  version: 2.6
   name: windows
   description: Плагин для взаимодействия с API Windows
-  author: Ts.Saltan
+  author: queinu
   icon: "develnext/bundle/windows/windows32.png"
   group: "system"
   class: "develnext\\bundle\\windows\\WindowsBundle"
